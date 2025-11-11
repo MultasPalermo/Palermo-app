@@ -3,18 +3,11 @@ import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWit
 import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from '../styles/DetalleInfraccionScreenStyles';
-import useDetalleInfraccion from '../hooks/useDetalleInfraccion';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
+import styles from '../styles/InfractionDetailScreenStyles';
+import useInfractionDetail from '../hooks/useInfractionDetail';
+import { DetalleInfraccionScreenProps, InfoMultaItem } from '../types/navigation';
 
-interface InfoMultaItem {
-  icon: string;
-  texto: string;
-  valor: string;
-}
-
-interface Infraccion {
+interface InfraccionDisplay {
   tipo: string;
   descripcion: string;
   fechaTexto: string;
@@ -24,21 +17,12 @@ interface Infraccion {
   fechaMax: string;
 }
 
-interface RouteParams {
-  infraccion?: Infraccion;
-}
-
-interface DetalleInfraccionScreenProps {
-  navigation: NativeStackNavigationProp<any>;
-  route: RouteProp<{ params: RouteParams }, 'params'>;
-}
-
-const DetalleInfraccionScreen: React.FC<DetalleInfraccionScreenProps> = ({ navigation, route }) => {
+const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ navigation, route }) => {
   const infraccionFromRoute = route?.params?.infraccion;
-  const { infraccion, resetTimer } = useDetalleInfraccion(navigation, infraccionFromRoute);
+  const { infraccion, resetTimer } = useInfractionDetail(navigation, infraccionFromRoute);
 
   // `infraccion` can be null when no data provided - provide a fallback shape
-  const fallback: Infraccion = {
+  const fallback: InfraccionDisplay = {
     tipo: 'No especificado',
     descripcion: 'Sin observaciones',
     fechaTexto: 'No especificada',
@@ -70,7 +54,7 @@ const DetalleInfraccionScreen: React.FC<DetalleInfraccionScreenProps> = ({ navig
           <BackButton style={styles.backBtn} onPress={() => navigation.goBack()} />
           <Text style={styles.titulo}>Detalle de Infracción</Text>
           <Text style={styles.seccion}>Infracción</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('ConsultaSmlv')} activeOpacity={0.7}>
+          <TouchableOpacity onPress={() => navigation.navigate('MinimumWageQuery')} activeOpacity={0.7}>
             <Text style={styles.consulta}>Consulta {data.consulta} <Ionicons name="help-circle-outline" size={16} color="#01763C" /></Text>
           </TouchableOpacity>
           <View style={styles.card}>
@@ -128,4 +112,4 @@ const DetalleInfraccionScreen: React.FC<DetalleInfraccionScreenProps> = ({ navig
   );
 };
 
-export default DetalleInfraccionScreen;
+export default InfractionDetailScreen;

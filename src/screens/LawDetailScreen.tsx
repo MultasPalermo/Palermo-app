@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, ScrollView, ImageBackground, Pressable } from 'react-native';
-import styles from '../styles/DetalleLeyScreenStyles';
+import styles from '../styles/LawDetailScreenStyles';
 import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
-import useDetalleLey from '../hooks/useDetalleLey';
+import useLawDetail from '../hooks/useLawDetail';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 
@@ -24,9 +24,9 @@ interface DetalleLeyScreenProps {
   route: RouteProp<{ params: RouteParams }, 'params'>;
 }
 
-const DetalleLeyScreen: React.FC<DetalleLeyScreenProps> = ({ navigation, route }) => {
+const LawDetailScreen: React.FC<DetalleLeyScreenProps> = ({ navigation, route }) => {
   const leyFromRoute = route?.params?.ley;
-  const { ley: leyFormatted, resetTimer } = useDetalleLey(navigation, leyFromRoute);
+  const { ley: leyFormatted, resetTimer } = useLawDetail(navigation, leyFromRoute);
   const ley = leyFormatted || { titulo: '', descripcion: '', textoCompleto: '', multa: null, articulos: null };
 
   return (
@@ -81,4 +81,4 @@ const DetalleLeyScreen: React.FC<DetalleLeyScreenProps> = ({ navigation, route }
   );
 };
 
-export default DetalleLeyScreen;
+export default LawDetailScreen;

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import useInactivity from './useInactivity';
 
-interface LeyInput {
+interface LawInput {
   descripcion?: string;
   textoCompleto?: string;
   multa?: string | null;
@@ -9,29 +9,29 @@ interface LeyInput {
   [key: string]: any;
 }
 
-interface LeyProcessed extends LeyInput {
+interface LawProcessed extends LawInput {
   descripcion: string;
   textoCompleto: string;
   multa: string | null;
   articulos: string | null;
 }
 
-interface UseDetalleLeyReturn {
-  ley: LeyProcessed | null;
+interface UseLawDetailReturn {
+  ley: LawProcessed | null;
   resetTimer: () => void;
   stopTimer: () => void;
 }
 
-export default function useDetalleLey(
+export default function useLawDetail(
   navigation: any,
-  leyFromRoute: LeyInput | null | undefined
-): UseDetalleLeyReturn {
-  const { resetTimer, stopTimer } = useInactivity(navigation, 'Bienvenida', 10000);
+  leyFromRoute: LawInput | null | undefined
+): UseLawDetailReturn {
+  const { resetTimer, stopTimer } = useInactivity(navigation, 'Welcome', 10000);
 
   const ley = useMemo(() => {
     if (!leyFromRoute) return null;
 
-    // Pasar algunos formatos básicos si fueran necesarios
+    // Apply basic formatting if necessary
     return {
       ...leyFromRoute,
       descripcion: leyFromRoute.descripcion || '-',

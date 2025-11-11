@@ -1,21 +1,63 @@
+/**
+ * Archivo de configuración centralizada para la API
+ * Lee variables de entorno desde .env usando react-native-dotenv
+ */
 
-// Archivo de configuración centralizada para las URLs base de la API
-// Lee la configuración desde variables de entorno cuando estén disponibles.
-// Para Expo se puede inyectar en `app.config.js`/`app.json` (extra) o usar un .env en desarrollo.
+// Valor por defecto si no hay variable de entorno
+const DEFAULT_API_HOST = "http://172.30.1.90:7285";
+const DEFAULT_API_TIMEOUT = 30000;
+
+// Intentar leer de variables de entorno
 let envHost: string | null = null;
+let envTimeout: string | null = null;
+let envDebug: string | null = null;
+
 try {
-	// Intentar leer de `process.env` (útil en builds o cuando se use react-native-dotenv)
 	envHost = process.env.API_HOST || null;
+	envTimeout = process.env.API_TIMEOUT || null;
+	envDebug = process.env.DEBUG_MODE || null;
 } catch (e) {
-	// ignore
+	// Si falla, usar valores por defecto
 }
 
-// Valor por defecto (mantener el comportamiento anterior si no hay env configurada)
-const DEFAULT_API_HOST = 'http://172.30.3.135:7286';
-
+/**
+ * URL base del servidor API
+ * Se lee desde la variable de entorno API_HOST o usa el valor por defecto
+ */
 export const API_HOST: string = envHost || DEFAULT_API_HOST;
 
-// También exportamos una función por si se necesita resolución dinámica desde otras fuentes.
+/**
+ * Timeout para peticiones API en milisegundos
+ * Se lee desde la variable de entorno API_TIMEOUT o usa 30 segundos por defecto
+ */
+export const API_TIMEOUT: number = envTimeout ? parseInt(envTimeout, 10) : DEFAULT_API_TIMEOUT;
+
+/**
+ * Modo debug para logging adicional
+ * Se lee desde la variable de entorno DEBUG_MODE
+ */
+export const DEBUG_MODE: boolean = envDebug === 'true';
+
+/**
+ * Obtiene el host de la API
+ * @returns URL del host de la API
+ */
 export function getApiHost(): string {
 	return API_HOST;
+}
+
+/**
+ * Obtiene el timeout configurado para peticiones API
+ * @returns Timeout en milisegundos
+ */
+export function getApiTimeout(): number {
+	return API_TIMEOUT;
+}
+
+/**
+ * Verifica si el modo debug está habilitado
+ * @returns true si el modo debug está hasbilitado
+ */
+export function isDebugMode(): boolean {
+	return DEBUG_MODE;
 }

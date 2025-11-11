@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, MutableRefObject } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { getUser, getDocumentInfo } from '../api/userCache';
 import { fetchPaymentAgreementsByDocument } from '../api/paymentAgreementApi';
@@ -128,7 +128,7 @@ export default function usePaymentAgreements(navigation: any): UsePaymentAgreeme
           text: 'Cerrar sesión',
           style: 'destructive',
           onPress: () => {
-            navigation.reset({ index: 0, routes: [{ name: 'Bienvenida' }] });
+            navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
           },
         },
         {

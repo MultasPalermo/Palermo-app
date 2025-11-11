@@ -2,7 +2,22 @@
   "permissions": {
     "allow": [
       "Bash(npx tsc:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm test:*)",
+      "Bash(npx jest:*)",
+      "Bash(git mv:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(rm:*)",
+      "Bash(npx expo start:*)",
+      "Bash(npx react-native start --reset-cache)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill /F /PID 18672)",
+      "Bash(taskkill //F //PID 18672)",
+      "Bash(npx expo install:*)",
+      "Bash(taskkill //F //PID 8708)",
+      "Bash(taskkill //F //PID 17308)"
     ],
     "deny": [],
     "ask": []

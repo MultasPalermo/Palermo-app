@@ -2,36 +2,18 @@ import React from 'react';
 import { View, Text, TextInput, FlatList, ImageBackground, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import styles from '../styles/MultasResultadoScreenStyles';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import useMultasResultado from '../hooks/useMultasResultado';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import styles from '../styles/FinesResultScreenStyles';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import useFinesResult from '../hooks/useFinesResult';
+import { MultasResultadoNavigationProp, MultasResultadoRouteProp } from '../types/navigation';
 
-interface Multa {
-  id: number;
-  typeInfractionName?: string;
-  observations?: string;
-  firstName?: string;
-  lastName?: string;
-  dateInfraction?: string;
-  date?: string;
-  value?: number;
-  amount?: number;
-  total?: number;
-}
-
-interface RouteParams {
-  [key: string]: any;
-}
-
-const MultasResultadoScreen: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const route = useRoute<RouteProp<{ params: RouteParams }, 'params'>>();
+const FinesResultScreen: React.FC = () => {
+  const navigation = useNavigation<MultasResultadoNavigationProp>();
+  const route = useRoute<MultasResultadoRouteProp>();
   const {
     displayName,
     docNumber,
     query,
-    setQuery,
     onQueryChange,
     filteredMultas,
     selectedIds,
@@ -39,7 +21,7 @@ const MultasResultadoScreen: React.FC = () => {
     resetTimer,
     formatCurrency,
     resumen,
-  } = useMultasResultado(navigation, route);
+  } = useFinesResult(navigation, route);
 
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
@@ -85,6 +67,11 @@ const MultasResultadoScreen: React.FC = () => {
               data={filteredMultas}
               keyExtractor={(item, idx) => item.id?.toString() || idx.toString()}
               contentContainerStyle={{ paddingBottom: 260 }}
+              maxToRenderPerBatch={10}
+              windowSize={5}
+              initialNumToRender={10}
+              removeClippedSubviews={true}
+              updateCellsBatchingPeriod={50}
               renderItem={({ item }) => {
                 const selected = selectedIds.includes(item.id);
                 return (
@@ -111,9 +98,9 @@ const MultasResultadoScreen: React.FC = () => {
                       <View style={styles.detailBox}>
                         <View style={styles.detailRow}><Text style={styles.detailLabel}>Fecha</Text><Text style={styles.detailValue}>{item.dateInfraction || item.date || ''}</Text></View>
                         <View style={styles.detailRow}><Text style={styles.detailLabel}>Tipo</Text><Text style={styles.detailValue}>{item.typeInfractionName || ''}</Text></View>
-                        <View style={styles.detailRow}><Text style={styles.detailLabel}>Descripcion</Text><Text style={styles.detailValue}>{item.observations || ''}</Text></View>
+                        <View style={styles.detailRow}><Text style={styles.detailLabel}>Descripción</Text><Text style={styles.detailValue}>{item.observations || ''}</Text></View>
                         <View style={{ marginTop: 8, alignItems: 'flex-end' }}>
-                          <TouchableOpacity style={styles.verMasButton} onPress={() => navigation.navigate('DetalleInfraccion', { infraccion: item })}>
+                          <TouchableOpacity style={styles.verMasButton} onPress={() => navigation.navigate('InfractionDetail', { infraccion: item })}>
                             <Text style={styles.verMasText}>Ver más</Text>
                           </TouchableOpacity>
                         </View>
@@ -133,11 +120,11 @@ const MultasResultadoScreen: React.FC = () => {
             <Ionicons name="list-outline" size={24} color="#01763C" />
             <Text style={styles.tabLabel}>Infracción</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('CodigoConvivencia')}>
+          <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('CoexistenceCode')}>
             <Ionicons name="book-outline" size={24} color="#01763C" />
             <Text style={styles.tabLabel}>Código de Convivencia</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('AcuerdoPago')}>
+          <TouchableOpacity style={styles.tabItem} onPress={() => navigation.navigate('PaymentAgreement')}>
             <Ionicons name="card-outline" size={24} color="#01763C" />
             <Text style={styles.tabLabel}>Acuerdo de Pago</Text>
           </TouchableOpacity>
@@ -147,7 +134,7 @@ const MultasResultadoScreen: React.FC = () => {
   );
 };
 
-export default MultasResultadoScreen;
+export default FinesResultScreen;
 
 // Extra: calcular total de seleccionadas
 export function calcularTotalSeleccionadas(multas: Multa[] = [], selectedIds: number[] = []): number {

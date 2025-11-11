@@ -1,5 +1,9 @@
 
 import apiClient from './apiClient';
+import { User } from '../types/api';
+import { UserSchema, validateData } from '../validation/schemas';
+import { logDebug, logError, logWarn } from '../utils/logger';
+import { NetworkError, ValidationError } from '../utils/errorHandler';
 
 const API_PATH = '/api/Users';
 
@@ -10,21 +14,39 @@ const API_PATH = '/api/Users';
  * @param {string|number} documentTypeId
  * @param {string|number} documentNumber
  */
-export async function buscarUsuarioPorDocumento(documentTypeId: string | number, documentNumber: string | number): Promise<any | null> {
+export async function buscarUsuarioPorDocumento(documentTypeId: string | number, documentNumber: string | number): Promise<User | null> {
   if (!documentTypeId || !documentNumber) return null;
+
+  const context = { component: 'userApi', function: 'buscarUsuarioPorDocumento' };
+
   try {
-    // Intentar pedir al servidor filtrado por documento
+    logDebug(`Buscando usuario: ${documentTypeId} - ${documentNumber}`, context);
+
     const params = { documentTypeId, documentNumber };
-    // Algunos backends no soportan estos parámetros; apiFetch devolverá lo que haya
     const res = await apiClient.apiFetch(API_PATH, { params });
     const users = Array.isArray(res) ? res : res?.data ?? [];
-    // Si la API devolvió una lista, buscar coincidencia exacta
-    const encontrado = users.find(u => String(u.documentTypeId) === String(documentTypeId) && String(u.documentNumber) === String(documentNumber)) || null;
-    return encontrado;
+
+    const encontrado = users.find((u: User) => String(u.documentTypeId) === String(documentTypeId) && String(u.documentNumber) === String(documentNumber)) || null;
+
+    if (encontrado) {
+      const validated = validateData(UserSchema, encontrado);
+      if (!validated) {
+        logWarn('Usuario devuelto por API no cumple con el esquema esperado', context);
+        throw new ValidationError('Datos de usuario inválidos');
+      }
+      logDebug('Usuario encontrado y validado', context);
+      return validated;
+    }
+
+    logDebug('Usuario no encontrado', context);
+    return null;
   } catch (error: any) {
     if (error && error.message && error.message.includes('No se pudo conectar')) {
-      throw new Error('No se pudo conectar con el servidor de usuarios. Verifica que el backend esté activo y accesible desde el dispositivo.');
+      const networkError = new NetworkError('No se pudo conectar con el servidor de usuarios', error);
+      logError(networkError.message, networkError, context);
+      throw networkError;
     }
+    logError('Error al buscar usuario', error, context);
     throw error;
   }
 }

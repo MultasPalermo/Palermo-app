@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import useInactivity from './useInactivity';
+import { RootNavigationProp } from '../types/navigation';
+import { formatCurrency, formatDate } from '../utils/formatters';
 
 interface InfoMulta {
   icon: string;
@@ -29,7 +31,7 @@ interface InfraccionInput {
   [key: string]: any;
 }
 
-interface InfraccionProcessed extends InfraccionInput {
+interface InfraccionProcessed extends Omit<InfraccionInput, 'monto' | 'fechaMax' | 'infoMulta'> {
   tipo: string;
   descripcion: string;
   fechaTexto: string;
@@ -46,32 +48,16 @@ interface UseDetalleInfraccionReturn {
   stopTimer: () => void;
 }
 
-// Hook para encapsular lógica mínima de DetalleInfraccion
-export default function useDetalleInfraccion(
-  navigation: any,
+// Hook para encapsular lógica mínima de InfractionDetail
+export default function useInfractionDetail(
+  navigation: RootNavigationProp,
   infraccionFromRoute: InfraccionInput | null | undefined
 ): UseDetalleInfraccionReturn {
   // Reuse the common inactivity hook (default timeout 10s like used elsewhere)
-  const { resetTimer, stopTimer } = useInactivity(navigation, 'Bienvenida', 10000);
+  const { resetTimer, stopTimer } = useInactivity(navigation, 'Welcome', 10000);
 
   const infraccion = useMemo(() => {
     if (!infraccionFromRoute) return null;
-
-    // Formateos simples que estaban inline en la pantalla
-    const formatCurrency = (value: number | null | undefined): string => {
-      if (value == null) return '-';
-      return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(value);
-    };
-
-    const formatDate = (iso: string | undefined): string => {
-      if (!iso) return '-';
-      try {
-        const d = new Date(iso);
-        return d.toLocaleDateString('es-CO');
-      } catch (e) {
-        return iso;
-      }
-    };
 
     // Normalizar los campos para la pantalla
     const tipo = infraccionFromRoute.typeInfractionName || infraccionFromRoute.tipo || infraccionFromRoute.type || 'No especificado';
