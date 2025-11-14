@@ -105,3 +105,34 @@ export interface DocumentInfo {
   numeroDocumento?: string;
   documentNumber?: string;
 }
+// Tipos para Pagos
+export interface PaymentPreference {
+  preferenceId: string;
+  initPoint: string;
+  sandboxInitPoint: string;
+  amount: number;
+  paymentId: number;
+}
+
+export interface Payment {
+  id: number;
+  amount: number;
+  status: PaymentStatusType;
+  statusDescription: string;
+  paidAt: string | null;
+  mercadoPagoPaymentId: number | null;
+  paymentMethod: string | null;
+  infraction: {
+    id: number;
+    stateInfraction: string;
+    description: string;
+  };
+}
+
+export type PaymentStatusType = 
+  | 'Pending' 
+  | 'Approved' 
+  | 'InProcess' 
+  | 'Rejected' 
+  | 'Cancelled' 
+  | 'Refunded';

@@ -50,7 +50,7 @@ export async function consultarInfracciones(options: ConsultarInfraccionesParams
     const validation = safeValidateData(InfraccionListSchema, rawData);
 
     if (!validation.success) {
-      logWarn('Algunas infracciones no cumplen con el esquema esperado', { ...context, errors: validation.error.errors });
+      logWarn('Algunas infracciones no cumplen con el esquema esperado', { ...context, errors: validation.error.issues });
       if (Array.isArray(rawData)) {
         const validItems = rawData.filter(item => {
           const itemValidation = safeValidateData(InfraccionAPISchema, item);

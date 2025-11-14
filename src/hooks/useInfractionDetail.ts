@@ -18,6 +18,7 @@ interface InfraccionInput {
   descripcion?: string;
   valor?: number;
   amount?: number;
+  amountToPay?: number;
   monto?: number;
   fechaMax?: string;
   dueDate?: string;
@@ -62,7 +63,7 @@ export default function useInfractionDetail(
     // Normalizar los campos para la pantalla
     const tipo = infraccionFromRoute.typeInfractionName || infraccionFromRoute.tipo || infraccionFromRoute.type || 'No especificado';
     const descripcion = infraccionFromRoute.observations || infraccionFromRoute.description || infraccionFromRoute.descripcion || '';
-    const monto = formatCurrency(infraccionFromRoute.valor ?? infraccionFromRoute.amount ?? infraccionFromRoute.monto);
+    const monto = formatCurrency(infraccionFromRoute.amountToPay ?? infraccionFromRoute.valor ?? infraccionFromRoute.amount ?? infraccionFromRoute.monto);
     const fechaMax = formatDate(infraccionFromRoute.fechaMax || infraccionFromRoute.dueDate || infraccionFromRoute.fecha_max);
 
     // Construir infoMulta si no existe

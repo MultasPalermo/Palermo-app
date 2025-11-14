@@ -4,7 +4,7 @@
  */
 
 // Valor por defecto si no hay variable de entorno
-const DEFAULT_API_HOST = "http://172.30.1.90:7285";
+const DEFAULT_API_HOST = "http://172.30.160.1:5162";
 const DEFAULT_API_TIMEOUT = 30000;
 
 // Intentar leer de variables de entorno

@@ -56,7 +56,7 @@ export async function obtenerTiposDocumento(forceRefresh: boolean = false): Prom
     if (!validation.success) {
       logWarn('Algunos tipos de documento no cumplen el esquema', {
         ...context,
-        errors: validation.error.errors
+        errors: validation.error.issues
       });
       throw new ValidationError('Datos de tipos de documento inválidos');
     }

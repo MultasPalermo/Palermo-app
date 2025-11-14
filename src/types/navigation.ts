@@ -30,6 +30,7 @@ export interface Infraction {
   monto?: string | number;
   valor?: number;
   amount?: number;
+  amountToPay?: number;
   total?: number;
   fechaMax?: string;
   dueDate?: string;

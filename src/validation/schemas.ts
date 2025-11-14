@@ -87,10 +87,65 @@ export const InfraccionListSchema = z.array(InfraccionAPISchema);
 // Esquema para lista de acuerdos de pago
 export const PaymentAgreementListSchema = z.array(PaymentAgreementSchema);
 
+// Esquemas para Pagos de MercadoPago
+export const PaymentStatusTypeSchema = z.enum(['Pending', 'Approved', 'InProcess', 'Rejected', 'Cancelled', 'Refunded']);
+
+export const PaymentPreferenceResponseSchema = z.object({
+  preferenceId: z.string(),
+  initPoint: z.string().url(),
+  sandboxInitPoint: z.string().url(),
+  amount: z.number().positive(),
+  paymentId: z.number().int().positive(),
+}).passthrough();
+
+export const PaymentStatusSchema = z.object({
+  id: z.number().int().positive(),
+  amount: z.number(),
+  status: PaymentStatusTypeSchema,
+  statusDescription: z.string(),
+  paidAt: z.string().nullable(),
+  mercadoPagoPaymentId: z.number().int().nullable(),
+  paymentMethod: z.string().nullable(),
+  infraction: z.object({
+    id: z.number().int().positive(),
+    stateInfraction: z.string(),
+    description: z.string(),
+  }).passthrough(),
+}).passthrough();
+
+export const UserPaymentSchema = z.object({
+  id: z.number().int().positive(),
+  amount: z.number(),
+  status: z.string(),
+  paidAt: z.string().nullable(),
+  paymentMethod: z.string().nullable(),
+  created_date: z.string(),
+  infraction: z.object({
+    id: z.number().int().positive(),
+    description: z.string(),
+    dateInfraction: z.string(),
+  }).passthrough(),
+}).passthrough();
+
+export const UserPaymentListSchema = z.array(UserPaymentSchema);
+
+export const PaymentHealthSchema = z.object({
+  status: z.string(),
+  database: z.string(),
+  paymentsTable: z.string(),
+  paymentsCount: z.number().int().nonnegative(),
+  mercadoPago: z.string(),
+  timestamp: z.string(),
+}).passthrough();
+
 // Tipos inferidos de los esquemas
 export type ValidatedUser = z.infer<typeof UserSchema>;
 export type ValidatedInfraccion = z.infer<typeof InfraccionAPISchema>;
 export type ValidatedPaymentAgreement = z.infer<typeof PaymentAgreementSchema>;
+export type ValidatedPaymentPreferenceResponse = z.infer<typeof PaymentPreferenceResponseSchema>;
+export type ValidatedPaymentStatus = z.infer<typeof PaymentStatusSchema>;
+export type ValidatedUserPayment = z.infer<typeof UserPaymentSchema>;
+export type ValidatedPaymentHealth = z.infer<typeof PaymentHealthSchema>;
 
 /**
  * Valida datos con un esquema Zod y retorna datos seguros o null
@@ -103,7 +158,7 @@ export function validateData<T>(schema: z.ZodSchema<T>, data: unknown): T | null
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      console.error('Validation error:', error.errors);
+      console.error('Validation error:', error.issues);
     }
     return null;
   }

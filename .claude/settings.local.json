@@ -17,7 +17,10 @@
       "Bash(taskkill //F //PID 18672)",
       "Bash(npx expo install:*)",
       "Bash(taskkill //F //PID 8708)",
-      "Bash(taskkill //F //PID 17308)"
+      "Bash(taskkill //F //PID 17308)",
+      "Bash(ping:*)",
+      "Bash(curl:*)",
+      "Bash(ipconfig:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
 import { LinearGradient } from 'expo-linear-gradient';
 import styles from '../styles/InfractionDetailScreenStyles';
 import useInfractionDetail from '../hooks/useInfractionDetail';
 import { DetalleInfraccionScreenProps, InfoMultaItem } from '../types/navigation';
+import { PaymentButton } from './PaymentButton';
 
 interface InfraccionDisplay {
   tipo: string;
@@ -32,6 +33,34 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
     fechaMax: '-',
   };
   const data = infraccion || fallback;
+
+  // Extraer datos para el pago
+  const userInfractionId = infraccionFromRoute?.id ?
+    (typeof infraccionFromRoute.id === 'number' ? infraccionFromRoute.id : parseInt(String(infraccionFromRoute.id), 10)) :
+    0;
+
+  const amount = infraccionFromRoute?.amountToPay ??
+    infraccionFromRoute?.valor ??
+    infraccionFromRoute?.amount ??
+    infraccionFromRoute?.monto ??
+    0;
+
+  const numericAmount = typeof amount === 'number' ? amount : parseFloat(String(amount)) || 0;
+
+  // DEBUG: Ver qué valores tenemos
+  console.log('🔍 DEBUG PAGO:', {
+    infraccionFromRoute,
+    userInfractionId,
+    amount,
+    numericAmount,
+    hasId: userInfractionId > 0,
+    hasAmount: numericAmount > 0,
+  });
+
+  // Verificar si se puede pagar (tiene ID y monto válido)
+  const canPay = userInfractionId > 0 && numericAmount > 0;
+
+  console.log('💳 Puede pagar:', canPay);
 
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
@@ -105,6 +134,45 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
               <Text style={styles.cardTitle}>Fecha máxima de pago</Text>
               <Text style={styles.cardDesc}>{data.fechaMax}</Text>
             </View>
+          </View>
+
+          {/* Botón de Pago con MercadoPago */}
+          {/* TEMPORAL: Siempre visible para debugging */}
+          <View style={{ marginTop: 24, marginBottom: 40 }}>
+            {canPay ? (
+              <PaymentButton
+                userInfractionId={userInfractionId}
+                amount={numericAmount}
+                useSandbox={true}
+                onPaymentInitiated={() => {
+                  console.log('Iniciando pago para infracción:', userInfractionId);
+                }}
+                onPaymentCompleted={() => {
+                  Alert.alert(
+                    'Pago Iniciado',
+                    'Se ha abierto MercadoPago. Una vez completado el pago, podrás verificar el estado en tu historial.',
+                    [
+                      {
+                        text: 'Entendido',
+                        onPress: () => navigation.goBack(),
+                      },
+                    ]
+                  );
+                }}
+              />
+            ) : (
+              <View style={{ padding: 16, backgroundColor: '#FFE5E5', borderRadius: 8 }}>
+                <Text style={{ color: '#CC0000', fontSize: 14, textAlign: 'center' }}>
+                  ⚠️ Botón de pago oculto
+                </Text>
+                <Text style={{ color: '#666', fontSize: 12, marginTop: 8, textAlign: 'center' }}>
+                  ID: {userInfractionId || 'Sin ID'} | Monto: ${numericAmount || '0'}
+                </Text>
+                <Text style={{ color: '#666', fontSize: 10, marginTop: 4, textAlign: 'center' }}>
+                  Revisa la consola para más detalles
+                </Text>
+              </View>
+            )}
           </View>
         </ScrollView>
       </View>
