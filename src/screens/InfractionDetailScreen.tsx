@@ -63,23 +63,25 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
   console.log('💳 Puede pagar:', canPay);
 
   return (
-    <TouchableWithoutFeedback onPress={resetTimer}>
-      <View style={{ flex: 1 }}>
-        <View style={styles.absoluteBg}>
-          <ImageBackground
-            source={require('../img/curva-perfil.png')}
-            style={styles.curveBg}
-            resizeMode="cover"
-          >
-            <LinearGradient
-              colors={["rgba(1,118,60,0.7)", "#F6FFF8"]}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
-              style={styles.gradientBg}
-            />
-          </ImageBackground>
-        </View>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+    <View style={{ flex: 1 }}>
+      <View style={styles.absoluteBg}>
+        <ImageBackground
+          source={require('../img/curva-perfil.png')}
+          style={styles.curveBg}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={["rgba(1,118,60,0.7)", "#F6FFF8"]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.gradientBg}
+          />
+        </ImageBackground>
+      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        onTouchStart={resetTimer}
+      >
           <BackButton style={styles.backBtn} onPress={() => navigation.goBack()} />
           <Text style={styles.titulo}>Detalle de Infracción</Text>
           <Text style={styles.seccion}>Infracción</Text>
@@ -173,10 +175,9 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
                 </Text>
               </View>
             )}
-          </View>
-        </ScrollView>
-      </View>
-    </TouchableWithoutFeedback>
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
