@@ -1,11 +1,4 @@
-export interface Ley {
-  id: string;
-  titulo: string;
-  descripcion: string;
-  textoCompleto: string;
-  multa: string;
-  articulos: string;
-}
+import { Ley } from '../interfaces/coexistence';
 
 export const coexistenceLaws: Ley[] = [
   {

@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'stretch',
+    alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.4)',
     position: 'relative',
@@ -51,6 +51,8 @@ const styles = StyleSheet.create({
   },
   card: {
     width: width * 0.9,
+    maxWidth: 400,
+    alignSelf: 'center',
     backgroundColor: 'rgba(245, 237, 237, 0.95)',
     borderRadius: 24,
     padding: 30,

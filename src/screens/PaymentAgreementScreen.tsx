@@ -6,39 +6,9 @@ import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
 import styles from '../styles/PaymentAgreementScreenStyles';
 import usePaymentAgreements from '../hooks/usePaymentAgreements';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { InstallmentPaymentButton } from './InstallmentPaymentButton';
-
-interface PaymentAgreement {
-  id: string | number;
-  personName?: string;
-  documentNumber?: string;
-  document?: string;
-  phoneNumber?: string;
-  address?: string;
-  neighborhood?: string;
-  typeFine?: string;
-  infringement?: string;
-  agreementStart?: string;
-  agreementEnd?: string;
-  paymentMethod?: string;
-  installments?: number;
-  baseAmount?: number;
-  monthlyFee?: number;
-  outstandingAmount?: number;
-  isCoactive?: boolean;
-  isPaid?: boolean;
-  [key: string]: any;
-}
-
-interface AcuerdoPagoScreenProps {
-  navigation: NativeStackNavigationProp<any>;
-}
-
-interface RenderAgreementItemProps {
-  item: PaymentAgreement;
-  index: number;
-}
+import { PaymentAgreement } from '../interfaces/hooks';
+import { AcuerdoPagoScreenProps, RenderAgreementItemProps } from '../interfaces/screens';
 
 const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }) => {
   const {

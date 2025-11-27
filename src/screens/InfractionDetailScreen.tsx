@@ -1,21 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import BackButton from '../components/BackButton';
 import { LinearGradient } from 'expo-linear-gradient';
+import BackButton from '../components/BackButton';
 import styles from '../styles/InfractionDetailScreenStyles';
 import useInfractionDetail from '../hooks/useInfractionDetail';
-import { DetalleInfraccionScreenProps, InfoMultaItem } from '../types/navigation';
+import { DetalleInfraccionScreenProps } from '../types/navigation';
+import { InfraccionDisplay } from '../interfaces/infraction';
 import { PaymentButton } from './PaymentButton';
-
-interface InfraccionDisplay {
-  tipo: string;
-  descripcion: string;
-  fechaTexto: string;
-  consulta: string;
-  infoMulta: InfoMultaItem[];
-  monto: string;
-}
 
 const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ navigation, route }) => {
   const infraccionFromRoute = route?.params?.infraccion;

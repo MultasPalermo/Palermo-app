@@ -1,13 +1,7 @@
 import { useState, useMemo } from 'react';
-import { coexistenceLaws, type Ley } from '../data/coexistenceLaws';
+import { coexistenceLaws } from '../data/coexistenceLaws';
+import { UseCoexistenceCodeReturn } from '../interfaces/coexistence';
 import useInactivity from './useInactivity';
-
-interface UseCoexistenceCodeReturn {
-  query: string;
-  setQuery: (query: string) => void;
-  filteredLeyes: Ley[];
-  resetTimer: () => void;
-}
 
 export default function useCoexistenceCode(navigation: any): UseCoexistenceCodeReturn {
   const [query, setQuery] = useState<string>('');
