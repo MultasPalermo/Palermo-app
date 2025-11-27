@@ -24,7 +24,8 @@
       "Bash(npx react-native log-android)",
       "Bash(npx react-native log-ios)",
       "Bash(timeout /t 3)",
-      "Bash(nul)"
+      "Bash(nul)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

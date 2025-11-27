@@ -1,16 +1,10 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BackButton from '../components/BackButton';
 import styles from '../styles/MinimumWageQueryScreenStyles';
 import useMinimumWageQuery from '../hooks/useMinimumWageQuery';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
-interface Multa {
-  id: string;
-  nombre: string;
-  smdlv: number;
-}
 
 interface ConsultaSmlvScreenProps {
   navigation: NativeStackNavigationProp<any>;

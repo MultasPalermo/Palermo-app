@@ -61,7 +61,6 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 15,
     marginBottom: 20,
-    backdropFilter: 'blur(10px)',
     borderWidth: 10,
     borderColor: '#01763C',
   },
@@ -85,6 +84,11 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 14,
+    fontWeight: '600',
+    color: '#34495e',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
   searchBar: {
     backgroundColor: '#fcfcfcff',
     borderRadius: 16,
@@ -101,11 +105,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
-  },
-    fontWeight: '600',
-    color: '#34495e',
-    marginBottom: 8,
-    marginLeft: 4,
   },
   input: {
     width: '100%',
@@ -169,7 +168,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#01763C',
     borderColor: '#01763C',
   },
-decorativeCircle: {
+  decorativeCircle: {
     position: 'absolute',
     borderRadius: 100,
   },

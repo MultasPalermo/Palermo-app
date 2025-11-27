@@ -19,12 +19,12 @@ interface InfraccionInput {
   valor?: number;
   amount?: number;
   amountToPay?: number;
-  monto?: number;
+  monto?: string | number;
   fechaMax?: string;
   dueDate?: string;
   fecha_max?: string;
   number?: string;
-  id?: string;
+  id?: string | number;
   fecha?: string;
   date?: string;
   dateInfraction?: string;
@@ -32,7 +32,7 @@ interface InfraccionInput {
   [key: string]: any;
 }
 
-interface InfraccionProcessed extends Omit<InfraccionInput, 'monto' | 'fechaMax' | 'infoMulta'> {
+interface InfraccionProcessed {
   tipo: string;
   descripcion: string;
   fechaTexto: string;
@@ -41,6 +41,7 @@ interface InfraccionProcessed extends Omit<InfraccionInput, 'monto' | 'fechaMax'
   monto: string;
   fechaMax: string;
   valorTexto: string;
+  [key: string]: any;
 }
 
 interface UseDetalleInfraccionReturn {
@@ -70,7 +71,11 @@ export default function useInfractionDetail(
     const infoMulta = Array.isArray(infraccionFromRoute.infoMulta)
       ? infraccionFromRoute.infoMulta
       : [
-          { icon: 'information-circle-outline', texto: 'Número de comparendo', valor: infraccionFromRoute.number || infraccionFromRoute.id || '-' },
+          {
+            icon: 'information-circle-outline',
+            texto: 'Número de comparendo',
+            valor: String(infraccionFromRoute.number || infraccionFromRoute.id || '-')
+          },
         ];
 
     return {

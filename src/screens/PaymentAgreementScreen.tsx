@@ -43,7 +43,6 @@ interface RenderAgreementItemProps {
 const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }) => {
   const {
     loading,
-    agreementsData,
     filteredData,
     query,
     setQuery,
