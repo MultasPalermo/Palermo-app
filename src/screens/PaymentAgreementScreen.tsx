@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, ImageBackground, ViewStyle, TextStyle } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, ImageBackground, ViewStyle, TextStyle, Alert, Modal, StyleSheet } from 'react-native';
 import { TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,7 @@ import BackButton from '../components/BackButton';
 import styles from '../styles/PaymentAgreementScreenStyles';
 import usePaymentAgreements from '../hooks/usePaymentAgreements';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { InstallmentPaymentButton } from './InstallmentPaymentButton';
 
 interface PaymentAgreement {
   id: string | number;
@@ -54,9 +55,34 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
     formatDate,
   } = usePaymentAgreements(navigation);
 
+  const [payingInstallments, setPayingInstallments] = useState<{[key: string]: number}>({});
+  const [showInstallmentModal, setShowInstallmentModal] = useState(false);
+  const [currentAgreementId, setCurrentAgreementId] = useState<string | number | null>(null);
+  const [installmentInput, setInstallmentInput] = useState('');
+
+  const handlePayInstallment = (agreementId: string | number) => {
+    console.log('🟢 [PaymentAgreementScreen] Abriendo modal para acuerdo:', agreementId);
+    setCurrentAgreementId(agreementId);
+    setInstallmentInput('');
+    setShowInstallmentModal(true);
+  };
+
+  const handleConfirmInstallment = () => {
+    console.log('🟢 [PaymentAgreementScreen] Confirmando cuota:', installmentInput);
+    const installmentId = parseInt(installmentInput || '0', 10);
+    if (installmentId > 0 && currentAgreementId) {
+      setPayingInstallments(prev => ({ ...prev, [currentAgreementId]: installmentId }));
+      setShowInstallmentModal(false);
+      console.log('🟢 [PaymentAgreementScreen] Cuota configurada:', installmentId, 'para acuerdo:', currentAgreementId);
+    } else {
+      Alert.alert('Error', 'Por favor ingresa un número de cuota válido');
+    }
+  };
+
   const renderAgreementItem = ({ item, index }: RenderAgreementItemProps) => {
     const isExpanded = expandedItems[item.id] || false;
     const agreementNumber = index + 1;
+    const payingInstallmentId = payingInstallments[item.id];
 
     return (
       <View style={styles.accordionContainer}>
@@ -189,6 +215,50 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
                 </View>
               </View>
             </View>
+
+            {/* Botón de Pago de Cuota */}
+            {!item.isPaid && (
+              <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
+                {payingInstallmentId ? (
+                  <InstallmentPaymentButton
+                    agreementId={Number(item.id)}
+                    installmentId={payingInstallmentId}
+                    amount={item.monthlyFee || 0}
+                    onPaymentCompleted={() => {
+                      setPayingInstallments(prev => {
+                        const newState = { ...prev };
+                        delete newState[item.id];
+                        return newState;
+                      });
+                      Alert.alert(
+                        'Pago Iniciado',
+                        'Se ha abierto MercadoPago. Una vez completado el pago, podrás verificar el estado en tu historial.',
+                        [{ text: 'Entendido' }]
+                      );
+                    }}
+                  />
+                ) : (
+                  <TouchableOpacity
+                    style={{
+                      backgroundColor: '#01763C',
+                      paddingVertical: 14,
+                      paddingHorizontal: 20,
+                      borderRadius: 8,
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                    }}
+                    onPress={() => handlePayInstallment(item.id)}
+                    activeOpacity={0.8}
+                  >
+                    <Ionicons name="card-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+                      Pagar una Cuota
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -297,8 +367,110 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
           </TouchableOpacity>
         </View>
       </SafeAreaView>
+
+      {/* Modal para ingresar número de cuota */}
+      <Modal
+        visible={showInstallmentModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowInstallmentModal(false)}
+      >
+        <View style={modalStyles.overlay}>
+          <View style={modalStyles.modal}>
+            <Text style={modalStyles.title}>Pagar Cuota</Text>
+            <Text style={modalStyles.subtitle}>Ingresa el número de la cuota que deseas pagar:</Text>
+
+            <TextInput
+              style={modalStyles.input}
+              value={installmentInput}
+              onChangeText={setInstallmentInput}
+              keyboardType="numeric"
+              placeholder="Ej: 1, 2, 3..."
+              autoFocus={true}
+            />
+
+            <View style={modalStyles.buttons}>
+              <TouchableOpacity
+                style={[modalStyles.button, modalStyles.buttonCancel]}
+                onPress={() => setShowInstallmentModal(false)}
+              >
+                <Text style={modalStyles.buttonTextCancel}>Cancelar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[modalStyles.button, modalStyles.buttonConfirm]}
+                onPress={handleConfirmInstallment}
+              >
+                <Text style={modalStyles.buttonTextConfirm}>Continuar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 };
+
+const modalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modal: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 24,
+    width: '85%',
+    maxWidth: 400,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#01763C',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  button: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonCancel: {
+    backgroundColor: '#f0f0f0',
+  },
+  buttonConfirm: {
+    backgroundColor: '#01763C',
+  },
+  buttonTextCancel: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  buttonTextConfirm: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
 
 export default PaymentAgreementScreen;

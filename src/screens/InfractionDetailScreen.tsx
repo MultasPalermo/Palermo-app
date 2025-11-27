@@ -143,7 +143,6 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
               <PaymentButton
                 userInfractionId={userInfractionId}
                 amount={numericAmount}
-                useSandbox={true}
                 onPaymentInitiated={() => {
                   console.log('Iniciando pago para infracción:', userInfractionId);
                 }}

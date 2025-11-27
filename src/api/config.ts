@@ -4,7 +4,7 @@
  */
 
 // Valor por defecto si no hay variable de entorno
-const DEFAULT_API_HOST = "http://172.30.160.1:5162";
+const DEFAULT_API_HOST = "http://172.29.240.1:7286";
 const DEFAULT_API_TIMEOUT = 30000;
 
 // Intentar leer de variables de entorno
@@ -37,6 +37,18 @@ export const API_TIMEOUT: number = envTimeout ? parseInt(envTimeout, 10) : DEFAU
  * Se lee desde la variable de entorno DEBUG_MODE
  */
 export const DEBUG_MODE: boolean = envDebug === 'true';
+
+// Validar y loggear configuración al iniciar
+if (typeof console !== 'undefined') {
+  console.log('[API Config] Host configurado:', API_HOST);
+  console.log('[API Config] Timeout:', API_TIMEOUT, 'ms');
+  console.log('[API Config] Debug mode:', DEBUG_MODE);
+  
+  // Advertir si se usa el host por defecto
+  if (!envHost) {
+    console.warn('[API Config] Usando host por defecto. Considera configurar API_HOST en .env');
+  }
+}
 
 /**
  * Obtiene el host de la API

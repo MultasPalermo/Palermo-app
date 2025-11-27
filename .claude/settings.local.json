@@ -20,7 +20,11 @@
       "Bash(taskkill //F //PID 17308)",
       "Bash(ping:*)",
       "Bash(curl:*)",
-      "Bash(ipconfig:*)"
+      "Bash(ipconfig:*)",
+      "Bash(npx react-native log-android)",
+      "Bash(npx react-native log-ios)",
+      "Bash(timeout /t 3)",
+      "Bash(nul)"
     ],
     "deny": [],
     "ask": []

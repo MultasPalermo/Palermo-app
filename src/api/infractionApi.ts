@@ -65,12 +65,21 @@ export async function consultarInfracciones(options: ConsultarInfraccionesParams
     logDebug(`${validation.data.length} infracciones consultadas exitosamente`, context);
     return validation.data;
   } catch (error: any) {
-    if (error && error.message && error.message.includes('No se pudo conectar')) {
+    // Errores HTTP específicos
+    if (error?.status) {
+      const statusMsg = `Error HTTP ${error.status}`;
+      const details = error.body ? JSON.stringify(error.body) : error.message;
+      logError(`${statusMsg} al consultar infracciones: ${details}`, error, { ...context, httpStatus: error.status, errorBody: error.body });
+      throw new Error(`${statusMsg}: ${error.message || 'Error del servidor'}`);
+    }
+    // Errores de red
+    if (error && error.message && (error.message.includes('No se pudo conectar') || error.message.includes('tiempo de espera'))) {
       const networkError = new NetworkError('No se pudo conectar con el servidor de infracciones', error);
       logError(networkError.message, networkError, context);
       throw networkError;
     }
-    logError('Error al consultar infracciones', error, context);
+    // Otros errores
+    logError('Error al consultar infracciones', error, { ...context, errorType: error?.name, errorMessage: error?.message });
     throw error;
   }
 }
