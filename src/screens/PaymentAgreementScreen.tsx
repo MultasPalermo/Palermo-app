@@ -7,7 +7,6 @@ import BackButton from '../components/BackButton';
 import styles from '../styles/PaymentAgreementScreenStyles';
 import usePaymentAgreements from '../hooks/usePaymentAgreements';
 import { InstallmentPaymentButton } from './InstallmentPaymentButton';
-import { PaymentAgreement } from '../interfaces/hooks';
 import { AcuerdoPagoScreenProps, RenderAgreementItemProps } from '../interfaces/screens';
 
 const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }) => {
@@ -27,24 +26,70 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
   const [payingInstallments, setPayingInstallments] = useState<{[key: string]: number}>({});
   const [showInstallmentModal, setShowInstallmentModal] = useState(false);
   const [currentAgreementId, setCurrentAgreementId] = useState<string | number | null>(null);
+  const [currentAgreement, setCurrentAgreement] = useState<any>(null);
   const [installmentInput, setInstallmentInput] = useState('');
+  const [installmentError, setInstallmentError] = useState('');
 
-  const handlePayInstallment = (agreementId: string | number) => {
+  const handlePayInstallment = (agreementId: string | number, agreement: any) => {
     console.log('🟢 [PaymentAgreementScreen] Abriendo modal para acuerdo:', agreementId);
     setCurrentAgreementId(agreementId);
+    setCurrentAgreement(agreement);
     setInstallmentInput('');
+    setInstallmentError('');
     setShowInstallmentModal(true);
+  };
+
+  const handleInstallmentInputChange = (text: string) => {
+    // Limpiar error al escribir
+    if (installmentError) {
+      setInstallmentError('');
+    }
+    
+    // Solo permitir números
+    const numericValue = text.replace(/[^0-9]/g, '');
+    
+    // Limitar a 3 dígitos
+    if (numericValue.length <= 3) {
+      setInstallmentInput(numericValue);
+    }
   };
 
   const handleConfirmInstallment = () => {
     console.log('🟢 [PaymentAgreementScreen] Confirmando cuota:', installmentInput);
-    const installmentId = parseInt(installmentInput || '0', 10);
-    if (installmentId > 0 && currentAgreementId) {
+    
+    // Validar que hay entrada
+    if (!installmentInput.trim()) {
+      setInstallmentError('Por favor ingresa un número de cuota');
+      return;
+    }
+
+    const installmentId = parseInt(installmentInput, 10);
+    const maxInstallments = currentAgreement?.installments || 999;
+    
+    // Validar que sea un número válido
+    if (isNaN(installmentId)) {
+      setInstallmentError('Ingresa solo números');
+      return;
+    }
+    
+    // Validar que sea mayor a 0
+    if (installmentId <= 0) {
+      setInstallmentError('El número de cuota debe ser mayor a 0');
+      return;
+    }
+    
+    // Validar que no exceda el máximo de cuotas
+    if (installmentId > maxInstallments) {
+      setInstallmentError(`Este acuerdo tiene máximo ${maxInstallments} cuota${maxInstallments !== 1 ? 's' : ''}`);
+      return;
+    }
+    
+    // Si todas las validaciones pasan
+    if (currentAgreementId) {
       setPayingInstallments(prev => ({ ...prev, [currentAgreementId]: installmentId }));
       setShowInstallmentModal(false);
+      setInstallmentError('');
       console.log('🟢 [PaymentAgreementScreen] Cuota configurada:', installmentId, 'para acuerdo:', currentAgreementId);
-    } else {
-      Alert.alert('Error', 'Por favor ingresa un número de cuota válido');
     }
   };
 
@@ -217,7 +262,7 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
                       flexDirection: 'row',
                       justifyContent: 'center',
                     }}
-                    onPress={() => handlePayInstallment(item.id)}
+                    onPress={() => handlePayInstallment(item.id, item)}
                     activeOpacity={0.8}
                   >
                     <Ionicons name="card-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
@@ -347,16 +392,27 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
         <View style={modalStyles.overlay}>
           <View style={modalStyles.modal}>
             <Text style={modalStyles.title}>Pagar Cuota</Text>
-            <Text style={modalStyles.subtitle}>Ingresa el número de la cuota que deseas pagar:</Text>
+            <Text style={modalStyles.subtitle}>
+              Ingresa el número de la cuota que deseas pagar:
+            </Text>
+            {currentAgreement && (
+              <Text style={modalStyles.infoText}>
+                Este acuerdo tiene {currentAgreement.installments} cuota{currentAgreement.installments !== 1 ? 's' : ''}
+              </Text>
+            )}
 
             <TextInput
-              style={modalStyles.input}
+              style={[modalStyles.input, installmentError ? modalStyles.inputError : null]}
               value={installmentInput}
-              onChangeText={setInstallmentInput}
+              onChangeText={handleInstallmentInputChange}
               keyboardType="numeric"
               placeholder="Ej: 1, 2, 3..."
               autoFocus={true}
+              maxLength={3}
             />
+            {installmentError ? (
+              <Text style={modalStyles.errorText}>{installmentError}</Text>
+            ) : null}
 
             <View style={modalStyles.buttons}>
               <TouchableOpacity
@@ -403,7 +459,13 @@ const modalStyles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     color: '#666',
-    marginBottom: 20,
+    marginBottom: 8,
+  },
+  infoText: {
+    fontSize: 13,
+    color: '#01763C',
+    marginBottom: 16,
+    fontWeight: '500',
   },
   input: {
     borderWidth: 1,
@@ -411,7 +473,17 @@ const modalStyles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    marginBottom: 20,
+    marginBottom: 8,
+  },
+  inputError: {
+    borderColor: '#F44336',
+    borderWidth: 2,
+  },
+  errorText: {
+    color: '#F44336',
+    fontSize: 13,
+    marginBottom: 12,
+    marginTop: 4,
   },
   buttons: {
     flexDirection: 'row',

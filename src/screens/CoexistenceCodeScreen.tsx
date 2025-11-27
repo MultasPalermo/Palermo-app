@@ -13,6 +13,17 @@ interface CodigoConvivenciaScreenProps {
 const CoexistenceCodeScreen: React.FC<CodigoConvivenciaScreenProps> = ({ navigation }) => {
   const { query, setQuery, filteredLeyes, resetTimer } = useCoexistenceCode(navigation);
 
+  const handleQueryChange = (text: string) => {
+    // Validaciones:
+    // 1. Máximo 100 caracteres
+    if (text.length > 100) return;
+
+    // 2. Solo letras, números, espacios y caracteres básicos
+    const sanitizedText = text.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]/g, '');
+
+    setQuery(sanitizedText);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
       <View style={{ flex: 1 }}>
@@ -29,11 +40,14 @@ const CoexistenceCodeScreen: React.FC<CodigoConvivenciaScreenProps> = ({ navigat
             </Text>
             <TextInput
               style={[styles.searchBar, { marginTop: 12 }]}
-              placeholder="Consulta tu ley"
+              placeholder="Consulta tu ley (máx. 100 caracteres)"
               placeholderTextColor="#6B9080"
               value={query}
-              onChangeText={text => setQuery(text)}
+              onChangeText={handleQueryChange}
               onFocus={resetTimer}
+              maxLength={100}
+              autoCorrect={false}
+              autoCapitalize="none"
             />
             <FlatList
               data={filteredLeyes}

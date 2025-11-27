@@ -14,6 +14,7 @@ export interface UseMultasReturn {
   setTipoDocumento: (tipo: TipoDocumento) => void;
   numeroDocumento: string;
   setNumeroDocumento: (numero: string) => void;
+  handleNumeroDocumentoChange: (text: string) => void;
   acceptedTerms: boolean;
   setAcceptedTerms: (accepted: boolean) => void;
   showTermsModal: boolean;

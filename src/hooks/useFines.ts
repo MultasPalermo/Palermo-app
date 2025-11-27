@@ -18,6 +18,35 @@ export default function useFines(navigation: RootNavigationProp): UseMultasRetur
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Validación y sanitización del número de documento
+  const handleNumeroDocumentoChange = useCallback((text: string) => {
+    // Solo permitir números
+    const sanitized = text.replace(/[^0-9]/g, '');
+
+    // Límites según tipo de documento
+    let maxLength = 15; // Default
+
+    switch (tipoDocumento) {
+      case 'CC':
+        maxLength = 10; // Cédula de Ciudadanía Colombia
+        break;
+      case 'CE':
+        maxLength = 7; // Cédula de Extranjería
+        break;
+      case 'TI':
+        maxLength = 11; // Tarjeta de Identidad
+        break;
+      case 'PAS':
+        maxLength = 20; // Pasaporte
+        break;
+    }
+
+    // Aplicar límite
+    if (sanitized.length <= maxLength) {
+      setNumeroDocumento(sanitized);
+    }
+  }, [tipoDocumento]);
+
   const resetTimer = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -107,6 +136,7 @@ export default function useFines(navigation: RootNavigationProp): UseMultasRetur
     setTipoDocumento,
     numeroDocumento,
     setNumeroDocumento,
+    handleNumeroDocumentoChange,
     acceptedTerms,
     setAcceptedTerms,
     showTermsModal,

@@ -12,7 +12,7 @@ const FinesScreen: React.FC = () => {
     tipoDocumento,
     setTipoDocumento,
     numeroDocumento,
-    setNumeroDocumento,
+    handleNumeroDocumentoChange,
     acceptedTerms,
     setAcceptedTerms,
     showTermsModal,
@@ -112,7 +112,7 @@ const FinesScreen: React.FC = () => {
                       placeholder="Digita Tu Número De Documento"
                       placeholderTextColor="#000000ff"
                       value={numeroDocumento}
-                      onChangeText={setNumeroDocumento}
+                      onChangeText={handleNumeroDocumentoChange}
                       keyboardType="numeric"
                       onFocus={() => setFocusedInput('document')}
                       onBlur={() => setFocusedInput(null)}
