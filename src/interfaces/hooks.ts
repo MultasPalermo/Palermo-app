@@ -57,6 +57,7 @@ export interface PaymentAgreement {
 
 export interface ExpandedItems {
   [key: string]: boolean;
+  [key: number]: boolean;
 }
 
 export interface UsePaymentAgreementsReturn {

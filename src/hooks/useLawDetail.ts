@@ -1,26 +1,6 @@
 import { useMemo } from 'react';
 import useInactivity from './useInactivity';
-
-interface LawInput {
-  descripcion?: string;
-  textoCompleto?: string;
-  multa?: string | null;
-  articulos?: string | null;
-  [key: string]: any;
-}
-
-interface LawProcessed extends LawInput {
-  descripcion: string;
-  textoCompleto: string;
-  multa: string | null;
-  articulos: string | null;
-}
-
-interface UseLawDetailReturn {
-  ley: LawProcessed | null;
-  resetTimer: () => void;
-  stopTimer: () => void;
-}
+import type { LawInput, UseLawDetailReturn } from '../interfaces/law';
 
 export default function useLawDetail(
   navigation: any,

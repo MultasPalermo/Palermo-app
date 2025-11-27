@@ -13,6 +13,7 @@ export interface UseDetalleSmlvReturn {
   valorTotal: number;
   formatos: Formatos;
   resetTimer: () => void;
+  stopTimer: () => void;
 }
 
 export interface UseConsultaSmlvReturn {
