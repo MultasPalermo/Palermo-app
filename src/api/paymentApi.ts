@@ -114,14 +114,37 @@ export async function createPaymentPreference(
     // LOG TEMPORAL: Ver la respuesta real del backend
     console.log('🔍 [DEBUG] Respuesta raw del backend:', JSON.stringify(result, null, 2));
 
-    const validated = validateData(PaymentPreferenceResponseSchema, result);
+    // El backend devuelve un formato simple: { url: "..." }
+    // Adaptamos a la estructura completa esperada
+    const simpleValidation = safeValidateData(SimpleCheckoutResponseSchema, result);
 
-    if (!validated) {
-      logWarn('Respuesta de preferencia de pago no cumple con el esquema esperado', context);
+    if (!simpleValidation.success) {
+      console.error('❌ [ERROR] Validación fallida:', simpleValidation.error.issues);
+      logWarn('Respuesta de preferencia de pago no cumple con el esquema esperado', {
+        ...context,
+        errors: simpleValidation.error.issues,
+        receivedData: result
+      });
       throw new ValidationError('Datos de preferencia de pago inválidos');
     }
 
-    logDebug('Preferencia de pago creada exitosamente', { ...context, paymentId: validated.paymentId });
+    // Extraer preferenceId de la URL si es posible
+    const url = simpleValidation.data.url;
+    const prefMatch = url.match(/pref_id=([^&]+)/);
+    const preferenceId = prefMatch ? prefMatch[1] : '';
+
+    // Construir respuesta adaptada con valores por defecto
+    const validated: PaymentPreferenceResponse = {
+      preferenceId: preferenceId,
+      initPoint: url,
+      amount: 0, // No disponible en respuesta simple
+      currency: 'COP',
+      obligationId: userInfractionId,
+      contractId: 0, // No disponible
+      paymentId: null, // No disponible
+    };
+
+    logDebug('Preferencia de pago creada exitosamente', { ...context, url });
     return validated;
   } catch (error: any) {
     if (error instanceof ValidationError) {

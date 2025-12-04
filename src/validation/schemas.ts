@@ -93,7 +93,7 @@ export const PaymentStatusTypeSchema = z.enum(['Pending', 'Approved', 'InProcess
 export const PaymentPreferenceResponseSchema = z.object({
   preferenceId: z.string(),
   initPoint: z.string().url(),
-  amount: z.number().positive(),
+  amount: z.number(),
   currency: z.string(),
   obligationId: z.number().int(),
   contractId: z.number().int(),
