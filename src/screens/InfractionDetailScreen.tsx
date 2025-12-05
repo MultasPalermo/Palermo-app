@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import BackButton from '../components/BackButton';
@@ -53,23 +53,28 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
   console.log('💳 Puede pagar:', canPay);
 
   return (
-    <TouchableWithoutFeedback onPress={resetTimer}>
-      <View style={{ flex: 1 }}>
-        <View style={styles.absoluteBg}>
-          <ImageBackground
-            source={require('../img/curva-perfil.png')}
-            style={styles.curveBg}
-            resizeMode="cover"
-          >
-            <LinearGradient
-              colors={["rgba(1,118,60,0.7)", "#F6FFF8"]}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
-              style={styles.gradientBg}
-            />
-          </ImageBackground>
-        </View>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+    <View style={{ flex: 1 }}>
+      <View style={styles.absoluteBg}>
+        <ImageBackground
+          source={require('../img/curva-perfil.png')}
+          style={styles.curveBg}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={["rgba(1,118,60,0.7)", "#F6FFF8"]}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+            style={styles.gradientBg}
+          />
+        </ImageBackground>
+      </View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        onTouchStart={resetTimer}
+        onScrollBeginDrag={resetTimer}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
           <BackButton style={styles.backBtn} onPress={() => navigation.goBack()} />
           <Text style={styles.titulo}>Detalle de Infracción</Text>
           <Text style={styles.seccion}>Infracción</Text>
@@ -156,9 +161,8 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
               </View>
             )}
           </View>
-        </ScrollView>
-      </View>
-    </TouchableWithoutFeedback>
+      </ScrollView>
+    </View>
   );
 };
 
