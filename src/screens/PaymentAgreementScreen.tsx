@@ -279,7 +279,7 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
       resizeMode="cover"
     >
       <SafeAreaView style={styles.safeArea}>
-        <TouchableOpacity activeOpacity={1} onPress={resetTimer} style={styles.container}>
+        <View style={styles.container}>
           <View style={styles.header}>
             <BackButton style={styles.backButton} onPress={() => navigation.goBack()} />
             <Text style={styles.title}>Acuerdo de Pago</Text>
@@ -339,6 +339,8 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
                 initialNumToRender={8}
                 removeClippedSubviews={true}
                 updateCellsBatchingPeriod={50}
+                onTouchStart={resetTimer}
+                onScrollBeginDrag={resetTimer}
               />
             </View>
           ) : (
@@ -356,7 +358,7 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
               </TouchableOpacity>
             </View>
           )}
-        </TouchableOpacity>
+        </View>
 
         {/* tabBar dentro del SafeAreaView para que el fondo lo cubra */}
         <View style={styles.tabBar}>
