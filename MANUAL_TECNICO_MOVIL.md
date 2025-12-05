@@ -39,6 +39,8 @@ La aplicación gestiona infracciones relacionadas con:
 - **Versión**: 1.0.0
 - **Licencia**: 0BSD
 - **Plataforma**: Android (únicamente)
+- **Repositorio**: https://github.com/DanielCaicedo26/Trabajo-de-proyecto-final-react-native.git
+- **Lenguaje Principal**: TypeScript
 
 **⚠️ Nota Importante:** Esta aplicación está desarrollada **exclusivamente para Android**. No hay versiones para iOS ni Web.
 
@@ -90,15 +92,18 @@ La aplicación gestiona infracciones relacionadas con:
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    BACKEND API                              │
-│                http://172.30.160.1:7286                     │
+│                http://172.30.0.214:5162                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Patrón de Arquitectura
 - **Patrón**: Component-Based Architecture con Hooks
+- **Lenguaje**: TypeScript con tipado estricto
 - **Gestión de Estado**: React Hooks + Zustand
 - **Navegación**: React Navigation (Stack Navigator)
 - **Estilos**: StyleSheet separados por componente
+- **Cliente HTTP**: Centralizado con timeout y manejo de errores
+- **Caché**: Sistema de caché local para optimizar consultas
 
 ---
 
@@ -108,10 +113,12 @@ La aplicación gestiona infracciones relacionadas con:
 - **React**: 19.1.0
 - **React Native**: 0.81.4
 - **Expo**: ~54.0.10
+- **TypeScript**: ^5.9.3
 
 ### Navegación
 - **@react-navigation/native**: ^7.1.17
 - **@react-navigation/stack**: ^7.4.7
+- **@react-navigation/native-stack**: ^7.3.27
 - **react-native-gesture-handler**: ~2.28.0
 - **react-native-screens**: ~4.16.0
 - **react-native-safe-area-context**: ~5.6.0
@@ -129,6 +136,9 @@ La aplicación gestiona infracciones relacionadas con:
 - **Babel**: ^7.20.0
 - **@react-native-community/cli**: latest
 - **Expo Status Bar**: ~3.0.8
+- **@types/react**: ^19.2.2
+- **@types/react-native**: ^0.72.8
+- **@types/react-navigation**: ^3.0.8
 
 ---
 
@@ -144,57 +154,67 @@ Trabajo-de-proyecto-final-react-native/
 │   └── favicon.png                 # Favicon para web
 │
 ├── src/                            # Código fuente principal
-│   ├── api/                        # Configuración de API
-│   │   └── config.js               # URL base de la API
+│   ├── api/                        # Configuración de API y servicios
+│   │   ├── apiClient.ts            # Cliente HTTP centralizado con timeout
+│   │   ├── config.ts               # URL base de la API
+│   │   ├── infraccionesApi.ts      # API de infracciones
+│   │   ├── infraccionesCache.ts    # Caché de infracciones
+│   │   ├── paymentAgreementApi.ts  # API de acuerdos de pago
+│   │   ├── userApi.ts              # API de usuarios
+│   │   └── userCache.ts            # Caché de usuarios
 │   │
 │   ├── components/                 # Componentes reutilizables
-│   │   └── BackButton.js           # Botón de retroceso
+│   │   └── BackButton.tsx          # Botón de retroceso
 │   │
-│   ├── hooks/                      # Custom Hooks
-│   │   ├── useCodigoConvivencia.js # Hook para código de convivencia
-│   │   ├── useConsultaSmlv.js      # Hook para consulta SMDLV
-│   │   ├── useDetalleInfraccion.js # Hook para detalle de infracción
-│   │   ├── useDetalleLey.js        # Hook para detalle de ley
-│   │   ├── useDetalleSmlv.js       # Hook para detalle SMDLV
-│   │   ├── useInactivity.js        # Hook de inactividad
-│   │   ├── useMultas.js            # Hook principal de multas
-│   │   ├── useMultasResultado.js   # Hook para resultados
-│   │   └── usePaymentAgreements.js # Hook de acuerdos de pago
+│   ├── hooks/                      # Custom Hooks (TypeScript)
+│   │   ├── useCodigoConvivencia.ts # Hook para código de convivencia
+│   │   ├── useConsultaSmlv.ts      # Hook para consulta SMDLV
+│   │   ├── useDetalleInfraccion.ts # Hook para detalle de infracción
+│   │   ├── useDetalleLey.ts        # Hook para detalle de ley
+│   │   ├── useDetalleSmlv.ts       # Hook para detalle SMDLV
+│   │   ├── useInactivity.ts        # Hook de inactividad
+│   │   ├── useMultas.ts            # Hook principal de multas
+│   │   ├── useMultasResultado.ts   # Hook para resultados
+│   │   └── usePaymentAgreements.ts # Hook de acuerdos de pago
 │   │
 │   ├── img/                        # Imágenes de la aplicación
 │   │   ├── curva-perfil.png        # Fondo decorativo
 │   │   └── image 6.png             # Logo principal
 │   │
 │   ├── navigation/                 # Configuración de navegación
-│   │   └── AppNavigator.js         # Navegador principal
+│   │   └── AppNavigator.tsx        # Navegador principal
 │   │
-│   ├── screens/                    # Pantallas de la aplicación
-│   │   ├── AcuerdoPagoScreen.js    # Pantalla de acuerdos de pago
-│   │   ├── BienvenidaScreen.js     # Pantalla de bienvenida
-│   │   ├── CodigoConvivenciaScreen.js  # Código de convivencia
-│   │   ├── ConsultaSmlvScreen.js   # Consulta SMDLV
-│   │   ├── DetalleInfraccionScreen.js  # Detalle de infracción
-│   │   ├── DetalleLeyScreen.js     # Detalle de ley
-│   │   ├── DetalleSmlvScreen.js    # Detalle SMDLV
-│   │   ├── MultasResultadoScreen.js    # Resultados de multas
-│   │   └── MultasScreen.js         # Pantalla principal de multas
+│   ├── screens/                    # Pantallas de la aplicación (TypeScript)
+│   │   ├── AcuerdoPagoScreen.tsx   # Pantalla de acuerdos de pago
+│   │   ├── BienvenidaScreen.tsx    # Pantalla de bienvenida
+│   │   ├── CodigoConvivenciaScreen.tsx  # Código de convivencia
+│   │   ├── ConsultaSmlvScreen.tsx  # Consulta SMDLV
+│   │   ├── DetalleInfraccionScreen.tsx  # Detalle de infracción
+│   │   ├── DetalleLeyScreen.tsx    # Detalle de ley
+│   │   ├── DetalleSmlvScreen.tsx   # Detalle SMDLV
+│   │   ├── MultasResultadoScreen.tsx    # Resultados de multas
+│   │   └── MultasScreen.tsx        # Pantalla principal de multas
 │   │
-│   └── styles/                     # Estilos por componente
-│       ├── AcuerdoPagoScreenStyles.js
-│       ├── CodigoConvivenciaScreenStyles.js
-│       ├── ConsultaSmlvScreenStyles.js
-│       ├── DetalleInfraccionScreenStyles.js
-│       ├── DetalleLeyScreenStyles.js
-│       ├── DetalleSmlvScreenStyles.js
-│       ├── MultasResultadoScreenStyles.js
-│       └── MultasScreenStyles.js
+│   └── styles/                     # Estilos por componente (TypeScript)
+│       ├── AcuerdoPagoScreenStyles.ts
+│       ├── AppStyles.ts
+│       ├── CodigoConvivenciaScreenStyles.ts
+│       ├── ConsultaSmlvScreenStyles.ts
+│       ├── DetalleInfraccionScreenStyles.ts
+│       ├── DetalleLeyScreenStyles.ts
+│       ├── DetalleSmlvScreenStyles.ts
+│       ├── MultasResultadoScreenStyles.ts
+│       └── MultasScreenStyles.ts
 │
-├── App.js                          # Punto de entrada principal
+├── App.tsx                         # Punto de entrada principal
 ├── app.json                        # Configuración de Expo
 ├── babel.config.js                 # Configuración de Babel
-├── index.js                        # Registro de la app
+├── index.ts                        # Registro de la app
 ├── package.json                    # Dependencias del proyecto
-└── package-lock.json               # Lock de dependencias
+├── package-lock.json               # Lock de dependencias
+├── tsconfig.json                   # Configuración de TypeScript
+├── MANUAL_TECNICO_MOVIL.md         # Manual técnico
+└── MANUAL_USUARIO_MOVIL.md         # Manual de usuario
 ```
 
 ---
@@ -223,16 +243,24 @@ npm install
 
 #### 3. Configurar variables de entorno
 
-Editar `src/api/config.js`:
-```javascript
+Editar `src/api/config.ts`:
+```typescript
 const DEFAULT_API_HOST = 'http://TU_IP_O_DOMINIO:PUERTO';
 ```
+
+**Valor actual por defecto**: `http://172.30.0.214:5162`
 
 O usar variables de entorno (recomendado):
 ```bash
 # Crear archivo .env
-API_HOST=http://172.30.160.1:7286
+API_HOST=http://172.30.0.214:5162
 ```
+
+La aplicación incluye un cliente HTTP centralizado ([src/api/apiClient.ts](src/api/apiClient.ts)) con las siguientes características:
+- Timeout configurable (15 segundos por defecto)
+- Manejo automático de errores
+- Soporte para parámetros de query
+- Cancelación de solicitudes
 
 #### 4. Iniciar el proyecto
 
@@ -834,17 +862,63 @@ Renderizado de resultados formateados
 
 ### Configuración de API
 
-**Archivo**: `src/api/config.js`
+**Archivo**: `src/api/config.ts`
 
-```javascript
-const DEFAULT_API_HOST = 'http://172.30.160.1:7286';
+```typescript
+// Archivo de configuración centralizada para las URLs base de la API
+let envHost: string | null = null;
+try {
+	// Intentar leer de `process.env` (útil en builds o cuando se use react-native-dotenv)
+	envHost = process.env.API_HOST || null;
+} catch (e) {
+	// ignore
+}
 
-export const API_HOST = process.env.API_HOST || DEFAULT_API_HOST;
+// Valor por defecto (mantener el comportamiento anterior si no hay env configurada)
+const DEFAULT_API_HOST = 'http://172.30.0.214:5162';
 
-export function getApiHost() {
-  return API_HOST;
+export const API_HOST: string = envHost || DEFAULT_API_HOST;
+
+// También exportamos una función por si se necesita resolución dinámica desde otras fuentes.
+export function getApiHost(): string {
+	return API_HOST;
 }
 ```
+
+### Cliente HTTP Centralizado
+
+**Archivo**: `src/api/apiClient.ts`
+
+La aplicación utiliza un cliente HTTP centralizado con las siguientes características:
+
+```typescript
+// Cliente HTTP central para fetch con timeout y manejo básico de errores
+const DEFAULT_TIMEOUT = 15000; // 15s
+
+export async function apiFetch(path: string, options: ApiFetchOptions = {}): Promise<any>
+```
+
+**Características del cliente HTTP**:
+- **Timeout configurable**: 15 segundos por defecto, evita solicitudes colgadas
+- **Manejo de errores**: Captura errores HTTP y de red
+- **Cancelación de solicitudes**: Usa AbortController para cancelar requests
+- **Construcción de URLs**: Maneja parámetros de query automáticamente
+- **Parsing de JSON**: Maneja respuestas JSON y texto
+- **Manejo de timeout**: Mensaje amigable cuando se excede el tiempo de espera
+
+### Sistema de Caché
+
+La aplicación implementa un sistema de caché para optimizar las consultas:
+
+**Infracciones** ([src/api/infraccionesCache.ts](src/api/infraccionesCache.ts)):
+```typescript
+export function setInfracciones(infracciones: any[]): void
+export function getInfracciones(): any[] | null
+```
+
+**Usuarios** ([src/api/userCache.ts](src/api/userCache.ts)):
+- Almacena datos de usuario consultados
+- Reduce llamadas redundantes a la API
 
 ### Endpoints
 
@@ -937,23 +1011,36 @@ const handleApiCall = async () => {
 
 ### Convenciones de Código
 
+#### Migración a TypeScript
+El proyecto ha sido migrado completamente a TypeScript para mayor seguridad de tipos y mejor experiencia de desarrollo.
+
 #### Nomenclatura
 - **Componentes**: PascalCase (ej. `MultasScreen`, `BackButton`)
 - **Funciones**: camelCase (ej. `handleConsultarMultas`, `resetTimer`)
 - **Constantes**: UPPER_SNAKE_CASE (ej. `API_HOST`, `SALARIO_MINIMO`)
-- **Archivos de componentes**: PascalCase.js
-- **Archivos de estilos**: PascalCaseStyles.js
+- **Interfaces**: PascalCase con prefijo I opcional (ej. `InfraccionInput`, `ApiError`)
+- **Tipos**: PascalCase (ej. `ApiFetchOptions`)
+- **Archivos de componentes**: PascalCase.tsx
+- **Archivos de estilos**: PascalCaseStyles.ts
+- **Archivos de hooks**: useNombre.ts
+- **Archivos de API**: nombreApi.ts
 
-#### Estructura de Componente
-```javascript
+#### Estructura de Componente (TypeScript)
+```typescript
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styles from '../styles/ComponentStyles';
 import useCustomHook from '../hooks/useCustomHook';
 
-const ComponentName = ({ navigation, route }) => {
-  // 1. Hooks
-  const [state, setState] = useState(initialValue);
+// Definir tipos para las props
+interface ComponentNameProps {
+  navigation: any;
+  route?: any;
+}
+
+const ComponentName: React.FC<ComponentNameProps> = ({ navigation, route }) => {
+  // 1. Hooks con tipos
+  const [state, setState] = useState<string>(initialValue);
   const { customData } = useCustomHook();
 
   // 2. Efectos
@@ -964,8 +1051,8 @@ const ComponentName = ({ navigation, route }) => {
     };
   }, [dependencies]);
 
-  // 3. Funciones
-  const handleAction = () => {
+  // 3. Funciones con tipos explícitos
+  const handleAction = (): void => {
     // Lógica
   };
 
@@ -981,6 +1068,40 @@ const ComponentName = ({ navigation, route }) => {
 };
 
 export default ComponentName;
+```
+
+#### Definición de Tipos e Interfaces
+```typescript
+// Interfaces para datos de entrada
+interface InfraccionInput {
+  typeInfractionName?: string;
+  observations?: string;
+  value?: number;
+  dateInfraction?: string;
+  [key: string]: any; // Para propiedades dinámicas
+}
+
+// Interfaces para datos procesados
+interface InfraccionProcessed extends Omit<InfraccionInput, 'value'> {
+  tipo: string;
+  descripcion: string;
+  valorTexto: string;
+}
+
+// Tipos para opciones de configuración
+interface ApiFetchOptions {
+  timeout?: number;
+  params?: Record<string, any> | null;
+  method?: string;
+  headers?: Record<string, string>;
+  body?: any;
+}
+
+// Tipos para errores personalizados
+interface ApiError extends Error {
+  status?: number;
+  body?: any;
+}
 ```
 
 ### Mejores Prácticas
@@ -1047,37 +1168,43 @@ const styles = StyleSheet.create({
 });
 ```
 
-### Crear un Nuevo Screen
+### Crear un Nuevo Screen (TypeScript)
 
 1. **Crear archivo de componente**:
 ```bash
-src/screens/NewScreen.js
+src/screens/NewScreen.tsx
 ```
 
 2. **Crear archivo de estilos**:
 ```bash
-src/styles/NewScreenStyles.js
+src/styles/NewScreenStyles.ts
 ```
 
 3. **Crear hook (si es necesario)**:
 ```bash
-src/hooks/useNewScreen.js
+src/hooks/useNewScreen.ts
 ```
 
 4. **Registrar en navegación**:
-```javascript
-// AppNavigator.js
+```typescript
+// AppNavigator.tsx
 <Stack.Screen name="NewScreen" component={NewScreen} />
 ```
 
 5. **Implementar componente básico**:
-```javascript
+```typescript
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 import styles from '../styles/NewScreenStyles';
 import useNewScreen from '../hooks/useNewScreen';
 
-const NewScreen = ({ navigation, route }) => {
+// Definir props
+interface NewScreenProps {
+  navigation: any;
+  route?: any;
+}
+
+const NewScreen: React.FC<NewScreenProps> = ({ navigation, route }) => {
   const { data, loading } = useNewScreen(navigation);
 
   if (loading) {
@@ -1092,6 +1219,46 @@ const NewScreen = ({ navigation, route }) => {
 };
 
 export default NewScreen;
+```
+
+6. **Implementar hook personalizado**:
+```typescript
+// src/hooks/useNewScreen.ts
+import { useState, useEffect } from 'react';
+
+interface UseNewScreenReturn {
+  data: any;
+  loading: boolean;
+  error: string | null;
+}
+
+const useNewScreen = (navigation: any): UseNewScreenReturn => {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Lógica del hook
+    fetchData();
+  }, []);
+
+  const fetchData = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      // Llamada a API
+      const result = await fetch('...');
+      setData(result);
+    } catch (err) {
+      setError('Error al cargar datos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { data, loading, error };
+};
+
+export default useNewScreen;
 ```
 
 ### Testing (Recomendado)
@@ -1627,5 +1794,94 @@ Para soporte técnico o consultas sobre el desarrollo:
 
 ---
 
-*Manual Técnico - Versión 1.0*
-*Última actualización: 2025*
+## Cambios Recientes y Mejoras
+
+### Migración a TypeScript (Última actualización)
+**Fecha**: Enero 2025
+
+El proyecto ha sido completamente migrado a TypeScript, lo que proporciona:
+
+**Beneficios**:
+- ✅ Seguridad de tipos en tiempo de compilación
+- ✅ Mejor autocompletado en IDEs
+- ✅ Detección temprana de errores
+- ✅ Documentación implícita con tipos
+- ✅ Refactoring más seguro
+
+**Archivos migrados**:
+- Todos los componentes de pantallas (`.tsx`)
+- Todos los hooks personalizados (`.ts`)
+- Todos los archivos de estilos (`.ts`)
+- Toda la capa de API y servicios (`.ts`)
+- Componentes reutilizables (`.tsx`)
+
+### Mejoras en la Arquitectura API
+
+**Cliente HTTP Centralizado** ([src/api/apiClient.ts](src/api/apiClient.ts)):
+- Implementación de timeout (15s por defecto)
+- Manejo automático de errores
+- Cancelación de solicitudes con AbortController
+- Parsing robusto de respuestas JSON
+
+**Sistema de Caché**:
+- Caché de infracciones consultadas ([src/api/infraccionesCache.ts](src/api/infraccionesCache.ts))
+- Caché de datos de usuario ([src/api/userCache.ts](src/api/userCache.ts))
+- Reduce llamadas redundantes a la API
+- Mejora la experiencia de usuario
+
+**Configuración Centralizada**:
+- Configuración de API mejorada con soporte para variables de entorno
+- Valor por defecto actualizado: `http://172.30.0.214:5162`
+- Función `getApiHost()` para resolución dinámica
+
+### Mejoras en los Hooks
+
+**useDetalleInfraccion.ts**:
+- Mejora en el tipado con `Omit` para evitar conflictos de tipos
+- Interface `InfraccionProcessed` más robusta
+- Mejor manejo de campos opcionales
+
+**useInactivity.ts**:
+- Implementación con tipos estrictos
+- Mejor manejo de timers con `useRef`
+
+### Componente BackButton
+- Migrado a TypeScript
+- Props tipadas correctamente
+- Componente reutilizable en todas las pantallas
+- Diseño consistente con sombras y estilo Material
+
+### Mejoras en la Experiencia de Usuario
+- Tiempo de inactividad configurable por pantalla
+- Manejo de errores más informativo
+- Indicadores de carga mejorados
+- Transiciones suaves entre pantallas
+
+### Historial de Commits Recientes
+```
+cf469bf - cambios
+9da700e - cambio de nombre de los manuales
+57ef035 - cambios de descarga
+cdc485a - actualiza el manual técnico
+4d4e25f - implementacion de manuales
+061ab96 - mejora la configuración de la API y centraliza el manejo de solicitudes HTTP
+9aa5daf - agrega componente BackButton
+cbf887b - se actualizo la version del sdk
+9a54286 - el color de los iconos y textos a un tono verde
+fae6460 - mejora la estructura y el estilo de AcuerdoPagoScreen
+```
+
+### Próximas Mejoras Planeadas
+- [ ] Implementar tests unitarios con Jest
+- [ ] Agregar tests de integración
+- [ ] Mejorar accesibilidad (ARIA labels)
+- [ ] Optimización de imágenes y assets
+- [ ] Implementar Analytics
+- [ ] Modo offline completo
+- [ ] Notificaciones push
+
+---
+
+*Manual Técnico - Versión 1.1*
+*Última actualización: Enero 2025*
+*Repositorio: https://github.com/DanielCaicedo26/Trabajo-de-proyecto-final-react-native*

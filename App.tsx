@@ -3,31 +3,32 @@ import 'react-native-gesture-handler';
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import BienvenidaScreen from './src/screens/BienvenidaScreen';
-import MultasScreen from './src/screens/MultasScreen';
-import MultasResultadoScreen from './src/screens/MultasResultadoScreen';
-import AcuerdoPagoScreen from './src/screens/AcuerdoPagoScreen';
-import DetalleInfraccionScreen from './src/screens/DetalleInfraccionScreen';
-import DetalleSmlvScreen from './src/screens/DetalleSmlvScreen';
-import CodigoConvivenciaScreen from './src/screens/CodigoConvivenciaScreen';
-import DetalleLeyScreen from './src/screens/DetalleLeyScreen';
-import ConsultaSmlvScreen from './src/screens/ConsultaSmlvScreen';
+import { RootStackParamList } from './src/types/navigation';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import FinesScreen from './src/screens/FinesScreen';
+import FinesResultScreen from './src/screens/FinesResultScreen';
+import PaymentAgreementScreen from './src/screens/PaymentAgreementScreen';
+import InfractionDetailScreen from './src/screens/InfractionDetailScreen';
+import MinimumWageDetailScreen from './src/screens/MinimumWageDetailScreen';
+import CoexistenceCodeScreen from './src/screens/CoexistenceCodeScreen';
+import LawDetailScreen from './src/screens/LawDetailScreen';
+import MinimumWageQueryScreen from './src/screens/MinimumWageQueryScreen';
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Bienvenida" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Bienvenida" component={BienvenidaScreen} />
-        <Stack.Screen name="Multas" component={MultasScreen} />
-  <Stack.Screen name="MultasResultado" component={MultasResultadoScreen} />
-  <Stack.Screen name="AcuerdoPago" component={AcuerdoPagoScreen} />
-  <Stack.Screen name="DetalleInfraccion" component={DetalleInfraccionScreen} />
-  <Stack.Screen name="ConsultaSmlv" component={ConsultaSmlvScreen} />
-  <Stack.Screen name="DetalleSmlv" component={DetalleSmlvScreen} />
-  <Stack.Screen name="CodigoConvivencia" component={CodigoConvivenciaScreen} />
-  <Stack.Screen name="DetalleLey" component={DetalleLeyScreen} />
+      <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Fines" component={FinesScreen} />
+        <Stack.Screen name="FinesResult" component={FinesResultScreen} />
+        <Stack.Screen name="PaymentAgreement" component={PaymentAgreementScreen} />
+        <Stack.Screen name="InfractionDetail" component={InfractionDetailScreen} />
+        <Stack.Screen name="MinimumWageQuery" component={MinimumWageQueryScreen} />
+        <Stack.Screen name="MinimumWageDetail" component={MinimumWageDetailScreen} />
+        <Stack.Screen name="CoexistenceCode" component={CoexistenceCodeScreen} />
+        <Stack.Screen name="LawDetail" component={LawDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

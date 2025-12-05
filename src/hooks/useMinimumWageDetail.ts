@@ -21,11 +21,11 @@ interface UseDetalleSmlvReturn {
   stopTimer: () => void;
 }
 
-export default function useDetalleSmlv(
+export default function useMinimumWageDetail(
   navigation: any,
   smdlvFromRoute?: number | null
 ): UseDetalleSmlvReturn {
-  const { resetTimer, stopTimer } = useInactivity(navigation, 'Bienvenida', 10000);
+  const { resetTimer, stopTimer } = useInactivity(navigation, 'Welcome', 10000);
 
   const SMLDV = Math.round(SALARIO_MINIMO / 30);
 

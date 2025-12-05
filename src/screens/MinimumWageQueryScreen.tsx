@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
-import styles from '../styles/ConsultaSmlvScreenStyles';
-import useConsultaSmlv from '../hooks/useConsultaSmlv';
+import styles from '../styles/MinimumWageQueryScreenStyles';
+import useMinimumWageQuery from '../hooks/useMinimumWageQuery';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 interface Multa {
@@ -16,8 +16,8 @@ interface ConsultaSmlvScreenProps {
   navigation: NativeStackNavigationProp<any>;
 }
 
-const ConsultaSmlvScreen: React.FC<ConsultaSmlvScreenProps> = ({ navigation }) => {
-  const { multas, resetTimer } = useConsultaSmlv(navigation);
+const MinimumWageQueryScreen: React.FC<ConsultaSmlvScreenProps> = ({ navigation }) => {
+  const { multas, resetTimer } = useMinimumWageQuery(navigation);
 
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
@@ -37,7 +37,7 @@ const ConsultaSmlvScreen: React.FC<ConsultaSmlvScreenProps> = ({ navigation }) =
                   style={styles.card}
                   activeOpacity={0.8}
                   onPress={() => {
-                    navigation.navigate('DetalleSmlv', { smdlv: multa.smdlv });
+                    navigation.navigate('MinimumWageDetail', { smdlv: multa.smdlv });
                   }}
                 >
                   <Ionicons
@@ -62,4 +62,4 @@ const ConsultaSmlvScreen: React.FC<ConsultaSmlvScreenProps> = ({ navigation }) =
   );
 };
 
-export default ConsultaSmlvScreen;
+export default MinimumWageQueryScreen;

@@ -12,18 +12,18 @@ import styles from '../styles/AppStyles';
 import useInactivity from '../hooks/useInactivity';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-interface BienvenidaScreenProps {
+interface WelcomeScreenProps {
   navigation: NativeStackNavigationProp<any>;
 }
 
-const BienvenidaScreen: React.FC<BienvenidaScreenProps> = ({ navigation }) => {
-  const { resetTimer } = useInactivity(navigation, 'Bienvenida');
+const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ navigation }) => {
+  const { resetTimer } = useInactivity(navigation, 'Welcome');
 
   const handleLoginPress = () => {
-    navigation.navigate('Multas');
+    navigation.navigate('Fines');
   };
 
-  // Detecta cualquier toque en la pantalla para reiniciar el temporizador
+  // Detects any touch on the screen to reset the timer
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
       <SafeAreaView style={styles.container}>
@@ -37,7 +37,7 @@ const BienvenidaScreen: React.FC<BienvenidaScreenProps> = ({ navigation }) => {
           <View style={styles.content}>
             <View style={styles.welcomeContainer}>
               <Text style={styles.welcomeTitle}>
-                Bienvenido a{"\n"}nuestro aplicativo
+                Bienvenido a{"\n"}nuestra aplicación
               </Text>
             </View>
             <View style={styles.buttonContainer}>
@@ -58,4 +58,4 @@ const BienvenidaScreen: React.FC<BienvenidaScreenProps> = ({ navigation }) => {
   );
 };
 
-export default BienvenidaScreen;
+export default WelcomeScreen;

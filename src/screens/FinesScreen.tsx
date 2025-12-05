@@ -1,13 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Image, Animated, StatusBar, ImageBackground, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, Modal, Pressable } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import styles from '../styles/MultasScreenStyles';
+import styles from '../styles/FinesScreenStyles';
 import { useNavigation } from '@react-navigation/native';
-import useMultas from '../hooks/useMultas';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import useFines from '../hooks/useFines';
+import { MultasNavigationProp } from '../types/navigation';
 
-const MultasScreen: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<any>>();
+const FinesScreen: React.FC = () => {
+  const navigation = useNavigation<MultasNavigationProp>();
   const {
     tipoDocumento,
     setTipoDocumento,
@@ -19,12 +19,10 @@ const MultasScreen: React.FC = () => {
     setShowTermsModal,
     loading,
     error,
-    setError,
     handleConsultarMultas,
     resetTimer,
     timerRef,
-    tipoDocumentoIdMap,
-  } = useMultas(navigation);
+  } = useFines(navigation);
   const [isButtonPressed, setIsButtonPressed] = React.useState(false);
   const [focusedInput, setFocusedInput] = React.useState<string | null>(null);
   // Animated values
@@ -35,7 +33,7 @@ const MultasScreen: React.FC = () => {
 
   useEffect(() => {
     resetTimer();
-    // Animaciones de entrada
+    // Entry animations
     Animated.sequence([
       Animated.timing(logoAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
       Animated.timing(cardAnim, { toValue: 1, duration: 500, useNativeDriver: true })
@@ -47,7 +45,7 @@ const MultasScreen: React.FC = () => {
     };
   }, []);
 
-  // La lógica de consulta ahora está en el hook useMultas: use handleConsultarMultas() desde el hook
+  // The query logic is now in the useFines hook: use handleConsultarMultas() from the hook
 
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
@@ -65,7 +63,7 @@ const MultasScreen: React.FC = () => {
             <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
               <View style={styles.container}>
                 <StatusBar barStyle="light-content" backgroundColor="#2E8B57" translucent />
-                {/* Barra de búsqueda eliminada por solicitud */}
+                {/* Search bar removed by request */}
                 <Animated.View style={[styles.logoContainer, {
                   opacity: logoAnim,
                   transform: [{ translateY: logoAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }]
@@ -85,7 +83,7 @@ const MultasScreen: React.FC = () => {
                   transform: [{ translateY: cardAnim.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }]
                 }]}
                 >
-                  <Text style={styles.subtitle}>Mira Infraccion</Text>
+                  <Text style={styles.subtitle}>Mira Infracción</Text>
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Tipo de Documento</Text>
                     <Picker
@@ -121,7 +119,7 @@ const MultasScreen: React.FC = () => {
                     />
                   </View>
                   <TouchableWithoutFeedback onPress={() => {
-                    // animación checkbox
+                    // checkbox animation
                     Animated.sequence([
                       Animated.timing(checkboxScale, { toValue: 0.85, duration: 100, useNativeDriver: true }),
                       Animated.timing(checkboxScale, { toValue: 1.05, duration: 120, useNativeDriver: true }),
@@ -206,4 +204,4 @@ const MultasScreen: React.FC = () => {
   );
 };
 
-export default MultasScreen;
+export default FinesScreen;

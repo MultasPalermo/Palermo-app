@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect, MutableRefObject } from 'react';
-import { getInfracciones } from '../api/infraccionesCache';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { getInfracciones } from '../api/infractionCache';
 import { getUser, getDocumentInfo } from '../api/userCache';
+import { RootNavigationProp, MultasResultadoRouteProp } from '../types/navigation';
+import { formatCurrency } from '../utils/formatters';
 
 interface Multa {
   id?: string | number;
@@ -14,17 +16,6 @@ interface Multa {
     userName?: string;
   };
   [key: string]: any;
-}
-
-interface RouteParams {
-  multas?: Multa[];
-  userName?: string;
-  numeroDocumento?: string;
-  documentNumber?: string;
-}
-
-interface Route {
-  params?: RouteParams;
 }
 
 interface Resumen {
@@ -47,17 +38,17 @@ interface UseMultasResultadoReturn {
   resumen: (items?: Multa[]) => Resumen;
 }
 
-// Hook para encapsular lógica de MultasResultadoScreen
-export default function useMultasResultado(
-  navigation: any,
-  route: Route
+// Hook para encapsular lógica de FinesResultScreen
+export default function useFinesResult(
+  navigation: RootNavigationProp,
+  route: MultasResultadoRouteProp
 ): UseMultasResultadoReturn {
   const multasInitial = route?.params?.multas || getInfracciones() || [];
   const cachedUser = getUser();
   const cachedDoc = getDocumentInfo();
 
-  const displayName = route?.params?.userName || cachedUser?.userName || `${cachedUser?.firstName || ''} ${cachedUser?.lastName || ''}`.trim();
-  const docNumber = route?.params?.numeroDocumento || route?.params?.documentNumber || cachedDoc?.numeroDocumento || cachedDoc?.documentNumber || '';
+  const displayName = cachedUser?.userName || `${cachedUser?.firstName || ''} ${cachedUser?.lastName || ''}`.trim();
+  const docNumber = cachedDoc?.numeroDocumento || cachedDoc?.documentNumber || '';
 
   const [query, setQuery] = useState<string>('');
   const [filteredMultas, setFilteredMultas] = useState<Multa[]>(multasInitial || []);
@@ -70,36 +61,32 @@ export default function useMultasResultado(
     setFilteredMultas(multasInitial || []);
   }, [multasInitial]);
 
-  const showInactivityAlert = () => {
-    // Reuse same UX as screens: reset to Bienvenida or keep session
-    // Note: keep Alert call here to preserve UI surface
-    // Importing Alert here would create a native dependency; instead call navigation.reset directly on timeout
-    navigation.reset({ index: 0, routes: [{ name: 'Bienvenida' }] });
-  };
+  const showInactivityAlert = useCallback(() => {
+    navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] });
+  }, [navigation]);
 
-  const resetTimer = () => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    // keep 5 minutos as original
+  const resetTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     timerRef.current = setTimeout(() => {
-      // show the alert by navigating to Bienvenida (keeps behavior consistent)
       showInactivityAlert();
     }, 300000);
-  };
+  }, [showInactivityAlert]);
 
   useEffect(() => {
     resetTimer();
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
     };
-  }, []);
+  }, [resetTimer]);
 
   const toggleSelect = (id: string | number) => {
     setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
-  };
-
-  const formatCurrency = (value: number | string | null | undefined): string => {
-    const n = Number(value || 0);
-    return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
   };
 
   const resumen = (items: Multa[] = []): Resumen => {

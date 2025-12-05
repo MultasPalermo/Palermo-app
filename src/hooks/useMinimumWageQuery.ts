@@ -19,8 +19,8 @@ interface UseConsultaSmlvReturn {
   resetTimer: () => void;
 }
 
-export default function useConsultaSmlv(navigation: any): UseConsultaSmlvReturn {
+export default function useMinimumWageQuery(navigation: any): UseConsultaSmlvReturn {
   const [multas] = useState<Multa[]>(defaultMultas);
-  const { resetTimer } = useInactivity(navigation, 'Bienvenida');
+  const { resetTimer } = useInactivity(navigation, 'Welcome');
   return { multas, resetTimer };
 }

@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
-import styles from '../styles/DetalleSmlvScreenStyles';
-import useDetalleSmlv from '../hooks/useDetalleSmlv';
+import styles from '../styles/MinimumWageDetailScreenStyles';
+import useMinimumWageDetail from '../hooks/useMinimumWageDetail';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 
@@ -16,9 +16,9 @@ interface DetalleSmlvScreenProps {
   route: RouteProp<{ params: RouteParams }, 'params'>;
 }
 
-const DetalleSmlvScreen: React.FC<DetalleSmlvScreenProps> = ({ navigation, route }) => {
+const MinimumWageDetailScreen: React.FC<DetalleSmlvScreenProps> = ({ navigation, route }) => {
   const smdlvFromRoute = route?.params?.smdlv;
-  const { SALARIO_MINIMO, SMLDV, smdlv, valorSmdlv, valorTotal, formatos, resetTimer } = useDetalleSmlv(navigation, smdlvFromRoute);
+  const { SALARIO_MINIMO, SMLDV, smdlv, valorSmdlv, valorTotal, formatos, resetTimer } = useMinimumWageDetail(navigation, smdlvFromRoute);
 
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>
@@ -30,27 +30,27 @@ const DetalleSmlvScreen: React.FC<DetalleSmlvScreenProps> = ({ navigation, route
         >
           <ScrollView contentContainerStyle={styles.scrollContent}>
             <BackButton style={styles.backBtn} onPress={() => navigation.goBack()} />
-            <Text style={styles.titulo}>Detalle de Infraccion</Text>
-            <Text style={styles.seccion}>Infraccion</Text>
+            <Text style={styles.titulo}>Detalle de Infracción</Text>
+            <Text style={styles.seccion}>Infracción</Text>
             <View style={styles.divider} />
             <View style={styles.card}>
               <View style={styles.iconBox}><Ionicons name="list-outline" size={32} color="#fff" /></View>
               <View style={styles.infoBox}>
-                <Text style={styles.label}>Numero de SMDLV</Text>
+                <Text style={styles.label}>Número de SMDLV</Text>
                 <Text style={styles.valueGreen}>{smdlv}</Text>
               </View>
             </View>
             <View style={styles.card}>
               <View style={styles.iconBox}><Ionicons name="cash-outline" size={32} color="#fff" /></View>
               <View style={styles.infoBox}>
-                <Text style={styles.label}>Salario minimo vigente</Text>
+                <Text style={styles.label}>Salario mínimo vigente</Text>
                 <Text style={styles.valueBlue}>{formatos.salarioTexto}</Text>
               </View>
             </View>
             <View style={styles.card}>
               <View style={styles.iconBox}><Ionicons name="calculator-outline" size={32} color="#fff" /></View>
               <View style={styles.infoBox}>
-                <Text style={styles.label}>Calculo del SMDLV</Text>
+                <Text style={styles.label}>Cálculo del SMDLV</Text>
                 <Text style={styles.valueBlue}>{formatos.calculoSmdlvTexto}</Text>
               </View>
             </View>
@@ -82,4 +82,4 @@ const DetalleSmlvScreen: React.FC<DetalleSmlvScreenProps> = ({ navigation, route
   );
 };
 
-export default DetalleSmlvScreen;
+export default MinimumWageDetailScreen;

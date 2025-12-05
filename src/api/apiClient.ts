@@ -61,12 +61,23 @@ export async function apiFetch(path: string, options: ApiFetchOptions = {}): Pro
       const err = new Error(message) as ApiError;
       err.status = res.status;
       err.body = json;
+      console.error(`[apiClient] Error HTTP ${res.status} en ${options.method || 'GET'} ${url}`, {
+        status: res.status,
+        statusText: res.statusText,
+        response: json || text,
+        headers: Object.fromEntries(res.headers.entries())
+      });
       throw err;
     }
     return json ?? text;
   } catch (error: any) {
     if (error.name === 'AbortError') {
+      console.error(`[apiClient] Timeout en ${options.method || 'GET'} ${url} después de ${timeout}ms`);
       throw new Error('La solicitud al servidor excedió el tiempo de espera. Intenta nuevamente.');
+    }
+    // Log error de red
+    if (!error.status) {
+      console.error(`[apiClient] Error de red en ${options.method || 'GET'} ${url}:`, error.message);
     }
     // preserva error para que el llamador lo maneje
     throw error;
