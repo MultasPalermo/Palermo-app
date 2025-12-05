@@ -1,16 +1,18 @@
 /**
- * Componente de botón de pago para MercadoPago
- * Permite a los usuarios pagar infracciones mediante MercadoPago
+ * Componente de botón de pago para cuotas de acuerdos de pago con MercadoPago
+ * Permite a los usuarios pagar cuotas de acuerdos mediante MercadoPago
  */
 
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
 import { usePayment } from '../hooks/usePayment';
 
-interface PaymentButtonProps {
-  /** ID de la infracción del usuario a pagar */
-  userInfractionId: number;
-  /** Monto a pagar en pesos colombianos */
+interface InstallmentPaymentButtonProps {
+  /** ID del acuerdo de pago */
+  agreementId: number;
+  /** ID de la cuota a pagar */
+  installmentId: number;
+  /** Monto de la cuota en pesos colombianos */
   amount: number;
   /** Si el botón está deshabilitado */
   disabled?: boolean;
@@ -21,43 +23,65 @@ interface PaymentButtonProps {
 }
 
 /**
- * Botón para iniciar un pago con MercadoPago
+ * Botón para iniciar un pago de cuota de acuerdo con MercadoPago
  *
  * @example
  * ```tsx
- * <PaymentButton
- *   userInfractionId={123}
+ * <InstallmentPaymentButton
+ *   agreementId={123}
+ *   installmentId={456}
  *   amount={50000}
- *   onPaymentCompleted={() => console.log('Pago iniciado')}
+ *   onPaymentCompleted={() => console.log('Pago de cuota iniciado')}
  * />
  * ```
  */
-export const PaymentButton: React.FC<PaymentButtonProps> = ({
-  userInfractionId,
+export const InstallmentPaymentButton: React.FC<InstallmentPaymentButtonProps> = ({
+  agreementId,
+  installmentId,
   amount,
   disabled = false,
   onPaymentInitiated,
   onPaymentCompleted,
 }) => {
-  const { loading, initiatePayment } = usePayment();
+  const { loading, initiateInstallmentPayment } = usePayment();
 
   const handlePayment = async () => {
+    console.log('🔵 [InstallmentPaymentButton] Botón clickeado');
+    console.log('🔵 [InstallmentPaymentButton] agreementId:', agreementId);
+    console.log('🔵 [InstallmentPaymentButton] installmentId:', installmentId);
+    console.log('🔵 [InstallmentPaymentButton] amount:', amount);
+
     try {
+      console.log('🔵 [InstallmentPaymentButton] Llamando onPaymentInitiated');
       onPaymentInitiated?.();
 
-      const result = await initiatePayment(userInfractionId);
+      console.log('🔵 [InstallmentPaymentButton] Llamando initiateInstallmentPayment');
+      const result = await initiateInstallmentPayment(agreementId, installmentId);
+      console.log('🔵 [InstallmentPaymentButton] Resultado:', result);
 
       if (result) {
+        console.log('🔵 [InstallmentPaymentButton] Pago exitoso, llamando onPaymentCompleted');
         onPaymentCompleted?.();
+      } else {
+        console.log('🔵 [InstallmentPaymentButton] No se recibió resultado');
       }
     } catch (error) {
       // Los errores ya son manejados por el hook usePayment
       // que muestra alertas al usuario
-      console.error('Error en el proceso de pago:', error);
+      console.error('❌ [InstallmentPaymentButton] Error en el proceso de pago de cuota:', error);
     }
   };
 
-  const isDisabled = disabled || loading || !userInfractionId || userInfractionId <= 0;
+  const isDisabled = disabled || loading || !agreementId || agreementId <= 0 || !installmentId || installmentId <= 0;
+
+  console.log('🔵 [InstallmentPaymentButton] Render - isDisabled:', isDisabled, {
+    disabled,
+    loading,
+    agreementId,
+    installmentId,
+    validAgreementId: agreementId > 0,
+    validInstallmentId: installmentId > 0,
+  });
 
   return (
     <TouchableOpacity
@@ -69,8 +93,8 @@ export const PaymentButton: React.FC<PaymentButtonProps> = ({
       disabled={isDisabled}
       activeOpacity={0.8}
       accessible={true}
-      accessibilityLabel={`Pagar ${amount.toLocaleString('es-CO')} pesos colombianos con MercadoPago`}
-      accessibilityHint="Abre MercadoPago para completar el pago"
+      accessibilityLabel={`Pagar cuota de ${amount.toLocaleString('es-CO')} pesos colombianos con MercadoPago`}
+      accessibilityHint="Abre MercadoPago para completar el pago de la cuota"
       accessibilityRole="button"
     >
       {loading ? (
@@ -80,7 +104,7 @@ export const PaymentButton: React.FC<PaymentButtonProps> = ({
         </View>
       ) : (
         <View style={styles.content}>
-          <Text style={styles.buttonText}>Pagar con MercadoPago</Text>
+          <Text style={styles.buttonText}>Pagar Cuota con MercadoPago</Text>
           <Text style={styles.amountText}>
             ${amount.toLocaleString('es-CO')} COP
           </Text>

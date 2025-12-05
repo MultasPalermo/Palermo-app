@@ -7,6 +7,7 @@ import { useState, useCallback } from 'react';
 import { Linking, Alert } from 'react-native';
 import {
   createPaymentPreference,
+  createAgreementInstallmentPayment,
   getPaymentStatus,
   PaymentPreferenceResponse,
   PaymentStatus,
@@ -18,24 +19,35 @@ interface UsePaymentReturn {
   loading: boolean;
   error: string | null;
   paymentData: PaymentPreferenceResponse | null;
-  initiatePayment: (userInfractionId: number, useSandbox?: boolean) => Promise<PaymentPreferenceResponse | null>;
+  initiatePayment: (userInfractionId: number) => Promise<PaymentPreferenceResponse | null>;
+  initiateInstallmentPayment: (agreementId: number, installmentId: number) => Promise<PaymentPreferenceResponse | null>;
   checkStatus: (paymentId: number) => Promise<PaymentStatus | null>;
   reset: () => void;
 }
 
 /**
- * Hook para gestionar pagos de infracciones con MercadoPago
+ * Hook para gestionar pagos de infracciones y cuotas de acuerdos con MercadoPago
  *
  * @returns {UsePaymentReturn} Funciones y estado para manejar pagos
  *
  * @example
  * ```tsx
- * const { loading, error, initiatePayment, checkStatus } = usePayment();
+ * const { loading, error, initiatePayment, initiateInstallmentPayment, checkStatus } = usePayment();
  *
- * const handlePay = async () => {
- *   const result = await initiatePayment(infractionId, true);
+ * // Pagar una infracción
+ * const handleInfractionPay = async () => {
+ *   const result = await initiatePayment(infractionId);
  *   if (result) {
- *     console.log('Pago iniciado:', result.paymentId);
+ *     console.log('Pago iniciado:', result.preferenceId);
+ *     console.log('Monto:', result.amount, result.currency);
+ *   }
+ * };
+ *
+ * // Pagar una cuota de acuerdo
+ * const handleInstallmentPay = async () => {
+ *   const result = await initiateInstallmentPayment(agreementId, installmentId);
+ *   if (result) {
+ *     console.log('Pago de cuota iniciado:', result.preferenceId);
  *   }
  * };
  * ```
@@ -54,18 +66,16 @@ export const usePayment = (): UsePaymentReturn => {
    * 3. Opcionalmente verifica el estado después de un tiempo
    *
    * @param {number} userInfractionId - ID de la infracción a pagar
-   * @param {boolean} useSandbox - true para ambiente de pruebas, false para producción
    * @returns {Promise<PaymentPreferenceResponse | null>} Datos de la preferencia o null si falla
    */
   const initiatePayment = useCallback(async (
-    userInfractionId: number,
-    useSandbox: boolean = true
+    userInfractionId: number
   ): Promise<PaymentPreferenceResponse | null> => {
     setLoading(true);
     setError(null);
 
     try {
-      logDebug('Iniciando proceso de pago', { ...context, userInfractionId, useSandbox });
+      logDebug('Iniciando proceso de pago', { ...context, userInfractionId });
 
       // Validar parámetros
       if (!userInfractionId || userInfractionId <= 0) {
@@ -77,7 +87,7 @@ export const usePayment = (): UsePaymentReturn => {
       setPaymentData(response);
 
       // 2. Abrir MercadoPago
-      const paymentUrl = useSandbox ? response.sandboxInitPoint : response.initPoint;
+      const paymentUrl = response.initPoint;
 
       logDebug('Abriendo URL de pago', { ...context, paymentUrl });
 
@@ -97,11 +107,21 @@ export const usePayment = (): UsePaymentReturn => {
 
     } catch (err: any) {
       let errorMessage = 'Error al procesar el pago';
+      let alertTitle = 'Error en el pago';
 
       if (err instanceof NetworkError) {
         errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
       } else if (err instanceof ValidationError) {
         errorMessage = err.message;
+      } else if (err.message && err.message.includes('no ha sido implementado')) {
+        // Error 404 - Endpoint no implementado
+        alertTitle = 'Servicio no disponible';
+        errorMessage = 'La funcionalidad de pagos en línea aún no está disponible. Por favor, contacta al administrador del sistema o realiza el pago por otros medios.';
+        logError('Endpoint de pagos no implementado', err, { 
+          ...context, 
+          userInfractionId,
+          action: 'Notificar al equipo de backend para implementar el endpoint'
+        });
       } else if (err.response?.data?.message) {
         errorMessage = err.response.data.message;
       } else if (err.message) {
@@ -111,7 +131,90 @@ export const usePayment = (): UsePaymentReturn => {
       setError(errorMessage);
       logError('Error al iniciar pago', err, { ...context, userInfractionId });
 
-      Alert.alert('Error en el pago', errorMessage, [{ text: 'Entendido' }]);
+      Alert.alert(alertTitle, errorMessage, [{ text: 'Entendido' }]);
+
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  /**
+   * Iniciar proceso de pago para una cuota de acuerdo de pago
+   * 1. Crea preferencia de pago en el servidor
+   * 2. Abre la URL de MercadoPago en el navegador
+   *
+   * @param {number} agreementId - ID del acuerdo de pago
+   * @param {number} installmentId - ID de la cuota a pagar
+   * @returns {Promise<PaymentPreferenceResponse | null>} Datos de la preferencia o null si falla
+   */
+  const initiateInstallmentPayment = useCallback(async (
+    agreementId: number,
+    installmentId: number
+  ): Promise<PaymentPreferenceResponse | null> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      logDebug('Iniciando proceso de pago de cuota', { ...context, agreementId, installmentId });
+
+      // Validar parámetros
+      if (!agreementId || agreementId <= 0) {
+        throw new ValidationError('ID de acuerdo inválido');
+      }
+
+      if (!installmentId || installmentId <= 0) {
+        throw new ValidationError('ID de cuota inválido');
+      }
+
+      // 1. Crear preferencia de pago
+      const response = await createAgreementInstallmentPayment(agreementId, installmentId);
+      setPaymentData(response);
+
+      // 2. Abrir MercadoPago
+      const paymentUrl = response.initPoint;
+
+      logDebug('Abriendo URL de pago de cuota', { ...context, paymentUrl });
+
+      const canOpen = await Linking.canOpenURL(paymentUrl);
+
+      if (!canOpen) {
+        throw new Error('No se puede abrir la URL de pago. Verifica los permisos de la aplicación.');
+      }
+
+      await Linking.openURL(paymentUrl);
+
+      logDebug('URL de pago de cuota abierta exitosamente', { ...context, paymentId: response.paymentId });
+
+      return response;
+
+    } catch (err: any) {
+      let errorMessage = 'Error al procesar el pago de la cuota';
+      let alertTitle = 'Error en el pago';
+
+      if (err instanceof NetworkError) {
+        errorMessage = 'No se pudo conectar con el servidor. Verifica tu conexión a internet.';
+      } else if (err instanceof ValidationError) {
+        errorMessage = err.message;
+      } else if (err.message && err.message.includes('no ha sido implementado')) {
+        alertTitle = 'Servicio no disponible';
+        errorMessage = 'La funcionalidad de pagos en línea aún no está disponible. Por favor, contacta al administrador del sistema o realiza el pago por otros medios.';
+        logError('Endpoint de pagos de cuota no implementado', err, {
+          ...context,
+          agreementId,
+          installmentId,
+          action: 'Notificar al equipo de backend para implementar el endpoint'
+        });
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+
+      setError(errorMessage);
+      logError('Error al iniciar pago de cuota', err, { ...context, agreementId, installmentId });
+
+      Alert.alert(alertTitle, errorMessage, [{ text: 'Entendido' }]);
 
       return null;
     } finally {
@@ -218,6 +321,7 @@ export const usePayment = (): UsePaymentReturn => {
     error,
     paymentData,
     initiatePayment,
+    initiateInstallmentPayment,
     checkStatus,
     reset,
   };

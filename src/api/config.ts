@@ -38,6 +38,18 @@ export const API_TIMEOUT: number = envTimeout ? parseInt(envTimeout, 10) : DEFAU
  */
 export const DEBUG_MODE: boolean = envDebug === 'true';
 
+// Validar y loggear configuración al iniciar
+if (typeof console !== 'undefined') {
+  console.log('[API Config] Host configurado:', API_HOST);
+  console.log('[API Config] Timeout:', API_TIMEOUT, 'ms');
+  console.log('[API Config] Debug mode:', DEBUG_MODE);
+  
+  // Advertir si se usa el host por defecto
+  if (!envHost) {
+    console.warn('[API Config] Usando host por defecto. Considera configurar API_HOST en .env');
+  }
+}
+
 /**
  * Obtiene el host de la API
  * @returns URL del host de la API

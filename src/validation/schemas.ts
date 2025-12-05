@@ -93,9 +93,16 @@ export const PaymentStatusTypeSchema = z.enum(['Pending', 'Approved', 'InProcess
 export const PaymentPreferenceResponseSchema = z.object({
   preferenceId: z.string(),
   initPoint: z.string().url(),
-  sandboxInitPoint: z.string().url(),
   amount: z.number().positive(),
-  paymentId: z.number().int().positive(),
+  currency: z.string(),
+  obligationId: z.number().int(),
+  contractId: z.number().int(),
+  paymentId: z.number().int().nullable(),
+}).passthrough();
+
+// Esquema simplificado para respuestas de checkout de cuotas (solo URL)
+export const SimpleCheckoutResponseSchema = z.object({
+  url: z.string().url(),
 }).passthrough();
 
 export const PaymentStatusSchema = z.object({
