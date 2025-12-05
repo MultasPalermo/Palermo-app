@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, MutableRefObject } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { consultarInfracciones } from '../api/infractionApi';
 import { buscarUsuarioPorDocumento } from '../api/userApi';
@@ -6,25 +6,7 @@ import { getDocumentTypeId } from '../api/documentTypeApi';
 import { setDocumentInfo, setUser } from '../api/userCache';
 import { setInfracciones } from '../api/infractionCache';
 import { RootNavigationProp, Infraccion } from '../types/navigation';
-
-type TipoDocumento = 'CC' | 'CE' | 'TI' | 'PAS' | '';
-
-interface UseMultasReturn {
-  tipoDocumento: TipoDocumento;
-  setTipoDocumento: (tipo: TipoDocumento) => void;
-  numeroDocumento: string;
-  setNumeroDocumento: (numero: string) => void;
-  acceptedTerms: boolean;
-  setAcceptedTerms: (accepted: boolean) => void;
-  showTermsModal: boolean;
-  setShowTermsModal: (show: boolean) => void;
-  loading: boolean;
-  error: string;
-  setError: (error: string) => void;
-  handleConsultarMultas: () => Promise<void>;
-  resetTimer: () => void;
-  timerRef: MutableRefObject<NodeJS.Timeout | null>;
-}
+import { TipoDocumento, UseMultasReturn } from '../interfaces/hooks';
 
 export default function useFines(navigation: RootNavigationProp): UseMultasReturn {
   const [tipoDocumento, setTipoDocumento] = useState<TipoDocumento>('');
@@ -35,6 +17,35 @@ export default function useFines(navigation: RootNavigationProp): UseMultasRetur
   const [error, setError] = useState<string>('');
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Validación y sanitización del número de documento
+  const handleNumeroDocumentoChange = useCallback((text: string) => {
+    // Solo permitir números
+    const sanitized = text.replace(/[^0-9]/g, '');
+
+    // Límites según tipo de documento
+    let maxLength = 15; // Default
+
+    switch (tipoDocumento) {
+      case 'CC':
+        maxLength = 10; // Cédula de Ciudadanía Colombia
+        break;
+      case 'CE':
+        maxLength = 7; // Cédula de Extranjería
+        break;
+      case 'TI':
+        maxLength = 11; // Tarjeta de Identidad
+        break;
+      case 'PAS':
+        maxLength = 20; // Pasaporte
+        break;
+    }
+
+    // Aplicar límite
+    if (sanitized.length <= maxLength) {
+      setNumeroDocumento(sanitized);
+    }
+  }, [tipoDocumento]);
 
   const resetTimer = useCallback(() => {
     if (timerRef.current) {
@@ -125,6 +136,7 @@ export default function useFines(navigation: RootNavigationProp): UseMultasRetur
     setTipoDocumento,
     numeroDocumento,
     setNumeroDocumento,
+    handleNumeroDocumentoChange,
     acceptedTerms,
     setAcceptedTerms,
     showTermsModal,

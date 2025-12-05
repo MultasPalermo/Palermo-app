@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, ImageBackground, ScrollView, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
 import BackButton from '../components/BackButton';
 import styles from '../styles/MinimumWageDetailScreenStyles';
 import useMinimumWageDetail from '../hooks/useMinimumWageDetail';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
 
 interface RouteParams {
   smdlv?: number;
@@ -18,7 +18,7 @@ interface DetalleSmlvScreenProps {
 
 const MinimumWageDetailScreen: React.FC<DetalleSmlvScreenProps> = ({ navigation, route }) => {
   const smdlvFromRoute = route?.params?.smdlv;
-  const { SALARIO_MINIMO, SMLDV, smdlv, valorSmdlv, valorTotal, formatos, resetTimer } = useMinimumWageDetail(navigation, smdlvFromRoute);
+  const { smdlv, formatos, resetTimer } = useMinimumWageDetail(navigation, smdlvFromRoute);
 
   return (
     <TouchableWithoutFeedback onPress={resetTimer}>

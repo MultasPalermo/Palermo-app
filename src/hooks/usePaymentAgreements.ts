@@ -2,35 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { getUser, getDocumentInfo } from '../api/userCache';
 import { fetchPaymentAgreementsByDocument } from '../api/paymentAgreementApi';
-
-interface PaymentAgreement {
-  id: string | number;
-  personName?: string;
-  documentNumber?: string;
-  document?: string;
-  typeFine?: string;
-  infringement?: string;
-  [key: string]: any;
-}
-
-interface ExpandedItems {
-  [key: string]: boolean;
-  [key: number]: boolean;
-}
-
-interface UsePaymentAgreementsReturn {
-  loading: boolean;
-  agreementsData: PaymentAgreement[];
-  filteredData: PaymentAgreement[];
-  query: string;
-  setQuery: (query: string) => void;
-  expandedItems: ExpandedItems;
-  toggleExpanded: (agreementId: string | number) => void;
-  fetchPaymentAgreements: () => Promise<void>;
-  resetTimer: () => void;
-  formatCurrency: (amount: number) => string;
-  formatDate: (dateString: string | null | undefined) => string;
-}
+import type { PaymentAgreement, ExpandedItems, UsePaymentAgreementsReturn } from '../interfaces/hooks';
 
 export default function usePaymentAgreements(navigation: any): UsePaymentAgreementsReturn {
   const [loading, setLoading] = useState<boolean>(false);
@@ -147,15 +119,17 @@ export default function usePaymentAgreements(navigation: any): UsePaymentAgreeme
     timerRef.current = setTimeout(showInactivityAlert, 300000); // 5 minutos
   }, [showInactivityAlert]);
 
-  const formatCurrency = useCallback((amount: number): string => {
+  const formatCurrency = useCallback((amount: number | string | undefined): string => {
+    const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+    if (numAmount === undefined || isNaN(numAmount)) return '$0';
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
       currency: 'COP',
       minimumFractionDigits: 0,
-    }).format(amount);
+    }).format(numAmount);
   }, []);
 
-  const formatDate = useCallback((dateString: string | null | undefined): string => {
+  const formatDate = useCallback((dateString: string | undefined): string => {
     if (!dateString) return 'No especificada';
     const date = new Date(dateString);
     return date.toLocaleDateString('es-CO', {

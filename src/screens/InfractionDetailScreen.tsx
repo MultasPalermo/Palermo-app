@@ -1,22 +1,13 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import BackButton from '../components/BackButton';
 import { LinearGradient } from 'expo-linear-gradient';
+import BackButton from '../components/BackButton';
 import styles from '../styles/InfractionDetailScreenStyles';
 import useInfractionDetail from '../hooks/useInfractionDetail';
-import { DetalleInfraccionScreenProps, InfoMultaItem } from '../types/navigation';
+import { DetalleInfraccionScreenProps } from '../types/navigation';
+import { InfraccionDisplay } from '../interfaces/infraction';
 import { PaymentButton } from './PaymentButton';
-
-interface InfraccionDisplay {
-  tipo: string;
-  descripcion: string;
-  fechaTexto: string;
-  consulta: string;
-  infoMulta: InfoMultaItem[];
-  monto: string;
-  fechaMax: string;
-}
 
 const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ navigation, route }) => {
   const infraccionFromRoute = route?.params?.infraccion;
@@ -30,7 +21,6 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
     consulta: 'SMDLV',
     infoMulta: [],
     monto: '-',
-    fechaMax: '-',
   };
   const data = infraccion || fallback;
 
@@ -122,19 +112,12 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
               </View>
             </View>
           )}
-          <Text style={styles.seccion}>Monto y fecha máxima</Text>
+          <Text style={styles.seccion}>Monto a pagar</Text>
           <View style={styles.card}>
             <View style={styles.cardIcon}><Ionicons name="cash-outline" size={28} color="#01763C" /></View>
             <View style={styles.cardInfo}>
               <Text style={styles.cardTitle}>Monto a pagar</Text>
               <Text style={styles.cardDesc}>{data.monto}</Text>
-            </View>
-          </View>
-          <View style={styles.card}>
-            <View style={styles.cardIcon}><Ionicons name="calendar-outline" size={28} color="#01763C" /></View>
-            <View style={styles.cardInfo}>
-              <Text style={styles.cardTitle}>Fecha máxima de pago</Text>
-              <Text style={styles.cardDesc}>{data.fechaMax}</Text>
             </View>
           </View>
 

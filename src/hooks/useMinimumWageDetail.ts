@@ -1,25 +1,8 @@
 import { useMemo } from 'react';
 import useInactivity from './useInactivity';
+import type { UseDetalleSmlvReturn } from '../interfaces/minimumWage';
 
 const SALARIO_MINIMO = 143500;
-
-interface Formatos {
-  salarioTexto: string;
-  calculoSmdlvTexto: string;
-  valorSmdlvTexto: string;
-  valorTotalTexto: string;
-}
-
-interface UseDetalleSmlvReturn {
-  SALARIO_MINIMO: number;
-  SMLDV: number;
-  smdlv: number;
-  valorSmdlv: number;
-  valorTotal: number;
-  formatos: Formatos;
-  resetTimer: () => void;
-  stopTimer: () => void;
-}
 
 export default function useMinimumWageDetail(
   navigation: any,

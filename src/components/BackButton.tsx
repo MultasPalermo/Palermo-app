@@ -1,13 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, View, StyleSheet, ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
-interface BackButtonProps {
-  onPress: () => void;
-  size?: number;
-  color?: string;
-  style?: ViewStyle;
-}
+import { BackButtonProps } from '../interfaces/components';
 
 const BackButton: React.FC<BackButtonProps> = ({ onPress, size = 24, color = '#01763C', style }) => {
   // Evitar que el style pasado sobrescriba las propiedades visuales del botón

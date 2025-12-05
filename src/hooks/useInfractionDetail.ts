@@ -2,58 +2,16 @@ import { useMemo } from 'react';
 import useInactivity from './useInactivity';
 import { RootNavigationProp } from '../types/navigation';
 import { formatCurrency, formatDate } from '../utils/formatters';
-
-interface InfoMulta {
-  icon: string;
-  texto: string;
-  valor: string;
-}
-
-interface InfraccionInput {
-  typeInfractionName?: string;
-  tipo?: string;
-  type?: string;
-  observations?: string;
-  description?: string;
-  descripcion?: string;
-  valor?: number;
-  amount?: number;
-  amountToPay?: number;
-  monto?: number;
-  fechaMax?: string;
-  dueDate?: string;
-  fecha_max?: string;
-  number?: string;
-  id?: string;
-  fecha?: string;
-  date?: string;
-  dateInfraction?: string;
-  infoMulta?: InfoMulta[];
-  [key: string]: any;
-}
-
-interface InfraccionProcessed extends Omit<InfraccionInput, 'monto' | 'fechaMax' | 'infoMulta'> {
-  tipo: string;
-  descripcion: string;
-  fechaTexto: string;
-  consulta: string;
-  infoMulta: InfoMulta[];
-  monto: string;
-  fechaMax: string;
-  valorTexto: string;
-}
-
-interface UseDetalleInfraccionReturn {
-  infraccion: InfraccionProcessed | null;
-  resetTimer: () => void;
-  stopTimer: () => void;
-}
+import {
+  InfraccionInput,
+  UseInfractionDetailReturn
+} from '../interfaces/infraction';
 
 // Hook para encapsular lógica mínima de InfractionDetail
 export default function useInfractionDetail(
   navigation: RootNavigationProp,
   infraccionFromRoute: InfraccionInput | null | undefined
-): UseDetalleInfraccionReturn {
+): UseInfractionDetailReturn {
   // Reuse the common inactivity hook (default timeout 10s like used elsewhere)
   const { resetTimer, stopTimer } = useInactivity(navigation, 'Welcome', 10000);
 
@@ -70,7 +28,11 @@ export default function useInfractionDetail(
     const infoMulta = Array.isArray(infraccionFromRoute.infoMulta)
       ? infraccionFromRoute.infoMulta
       : [
-          { icon: 'information-circle-outline', texto: 'Número de comparendo', valor: infraccionFromRoute.number || infraccionFromRoute.id || '-' },
+          {
+            icon: 'information-circle-outline',
+            texto: 'Número de comparendo',
+            valor: String(infraccionFromRoute.number || infraccionFromRoute.id || '-')
+          },
         ];
 
     return {
