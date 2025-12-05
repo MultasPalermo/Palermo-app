@@ -4,7 +4,7 @@
  */
 
 // Valor por defecto si no hay variable de entorno
-const DEFAULT_API_HOST = "http://172.30.6.176:5162";
+const DEFAULT_API_HOST = "https://web-app.graydune-e2d1949c.eastus2.azurecontainerapps.io";
 const DEFAULT_API_TIMEOUT = 30000;
 
 // Intentar leer de variables de entorno

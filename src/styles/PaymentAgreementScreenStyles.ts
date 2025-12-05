@@ -56,6 +56,9 @@ interface Styles {
   sectionHeader: ViewStyle;
   sectionTitle: TextStyle;
   sectionContent: ViewStyle;
+  paymentButtonContainer: ViewStyle;
+  selectInstallmentButton: ViewStyle;
+  selectInstallmentButtonText: TextStyle;
 }
 
 export default StyleSheet.create<Styles>({
@@ -468,5 +471,23 @@ export default StyleSheet.create<Styles>({
   },
   sectionContent: {
     gap: 12,
+  },
+  paymentButtonContainer: {
+    marginTop: 20,
+    paddingHorizontal: 16,
+  },
+  selectInstallmentButton: {
+    backgroundColor: '#01763C',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  selectInstallmentButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

@@ -4,7 +4,7 @@
  */
 
 import apiClient from './apiClient';
-import { DocumentType } from '../types/api';
+import type { DocumentType } from '../interfaces';
 import { DocumentTypeListSchema, safeValidateData } from '../validation/schemas';
 import { logDebug, logError, logWarn } from '../utils/logger';
 import { NetworkError, ValidationError } from '../utils/errorHandler';

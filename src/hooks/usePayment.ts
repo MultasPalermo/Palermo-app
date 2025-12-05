@@ -9,9 +9,11 @@ import {
   createPaymentPreference,
   createAgreementInstallmentPayment,
   getPaymentStatus,
+} from '../api/paymentApi';
+import type {
   PaymentPreferenceResponse,
   PaymentStatus,
-} from '../api/paymentApi';
+} from '../interfaces';
 import { logDebug, logError } from '../utils/logger';
 import { NetworkError, ValidationError } from '../utils/errorHandler';
 

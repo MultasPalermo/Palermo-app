@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ImageBackground, ScrollView, TouchableWithoutFeedback, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, ImageBackground, ScrollView, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import BackButton from '../components/BackButton';
@@ -71,6 +71,9 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         onTouchStart={resetTimer}
+        onScrollBeginDrag={resetTimer}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
       >
           <BackButton style={styles.backBtn} onPress={() => navigation.goBack()} />
           <Text style={styles.titulo}>Detalle de Infracción</Text>
@@ -157,7 +160,7 @@ const InfractionDetailScreen: React.FC<DetalleInfraccionScreenProps> = ({ naviga
                 </Text>
               </View>
             )}
-        </View>
+          </View>
       </ScrollView>
     </View>
   );

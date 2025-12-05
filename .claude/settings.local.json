@@ -25,7 +25,10 @@
       "Bash(npx react-native log-ios)",
       "Bash(timeout /t 3)",
       "Bash(nul)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(dir /s /b srcinterfaces 2)",
+      "Bash(dir /s /b *.test.* *.spec.* __tests__ __mocks__ 2)",
+      "Bash(dir:*)"
     ],
     "deny": [],
     "ask": []

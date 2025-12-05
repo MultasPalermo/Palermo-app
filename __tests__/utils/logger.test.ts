@@ -2,7 +2,7 @@
  * Tests para sistema de logging
  */
 
-import { logger, LogLevel } from '../logger';
+import { logger, LogLevel } from '../../src/utils/logger';
 
 describe('Logger', () => {
   beforeEach(() => {

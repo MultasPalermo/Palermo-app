@@ -2,7 +2,7 @@
  * Tests para esquemas de validación con Zod
  */
 
-import { UserSchema, InfraccionAPISchema, validateData } from '../schemas';
+import { UserSchema, InfraccionAPISchema, validateData } from '../../src/validation/schemas';
 
 describe('Zod Schemas', () => {
   describe('UserSchema', () => {
