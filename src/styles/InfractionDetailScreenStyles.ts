@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     paddingTop: 40,
-    paddingBottom: 60,
+    paddingBottom: 150,
   },
   backBtn: {
     marginBottom: 10,
