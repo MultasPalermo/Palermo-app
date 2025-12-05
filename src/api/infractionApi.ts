@@ -1,7 +1,7 @@
 
 // Módulo para consumir la API de infracciones
 import apiClient from './apiClient';
-import { InfraccionAPI, ConsultarInfraccionesParams } from '../types/api';
+import type { InfraccionAPI, ConsultarInfraccionesParams } from '../interfaces';
 import { InfraccionListSchema, InfraccionAPISchema, safeValidateData } from '../validation/schemas';
 import { logDebug, logError, logWarn } from '../utils/logger';
 import { NetworkError } from '../utils/errorHandler';

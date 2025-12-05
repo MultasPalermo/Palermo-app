@@ -8,12 +8,12 @@ import {
   getDocumentTypeAbbreviation,
   buildDocumentTypeMap,
   clearDocumentTypeCache,
-} from '../documentTypeApi';
-import apiClient from '../apiClient';
-import { DocumentType } from '../../types/api';
+} from '../../src/api/documentTypeApi';
+import apiClient from '../../src/api/apiClient';
+import { DocumentType } from '../../src/types/api';
 
 // Mock del apiClient
-jest.mock('../apiClient');
+jest.mock('../../src/api/apiClient');
 
 const mockDocumentTypes: DocumentType[] = [
   { id: 1, name: 'Cédula de Ciudadanía', abbreviation: 'CC' },

@@ -15,59 +15,67 @@ import {
 } from '../validation/schemas';
 import { logDebug, logError, logWarn } from '../utils/logger';
 import { NetworkError, ValidationError } from '../utils/errorHandler';
+import type {
+  PaymentPreferenceResponse,
+  PaymentStatus,
+  UserPayment,
+  PaymentHealthResponse,
+} from '../interfaces';
 
 // Rutas de la API
 const PAYMENT_BASE_PATH = '/api/payments';
 
 /**
- * Interfaces para respuestas de API
+ * Transforma respuesta simplificada de checkout a PaymentPreferenceResponse
+ * @private
  */
-export interface PaymentPreferenceResponse {
-  preferenceId: string;
-  initPoint: string;
-  amount: number;
-  currency: string;
-  obligationId: number;
-  contractId: number;
-  paymentId: number | null;
-}
+function transformSimpleCheckoutResponse(
+  url: string,
+  obligationId: number,
+  contractId: number = 0
+): PaymentPreferenceResponse {
+  const prefMatch = url.match(/pref_id=([^&]+)/);
+  const preferenceId = prefMatch ? prefMatch[1] : '';
 
-export interface PaymentStatus {
-  id: number;
-  amount: number;
-  status: 'Pending' | 'Approved' | 'InProcess' | 'Rejected' | 'Cancelled' | 'Refunded';
-  statusDescription: string;
-  paidAt: string | null;
-  mercadoPagoPaymentId: number | null;
-  paymentMethod: string | null;
-  infraction: {
-    id: number;
-    stateInfraction: string;
-    description: string;
+  return {
+    preferenceId,
+    initPoint: url,
+    amount: 0,
+    currency: 'COP',
+    obligationId,
+    contractId,
+    paymentId: null,
   };
 }
 
-export interface UserPayment {
-  id: number;
-  amount: number;
-  status: string;
-  paidAt: string | null;
-  paymentMethod: string | null;
-  created_date: string;
-  infraction: {
-    id: number;
-    description: string;
-    dateInfraction: string;
-  };
-}
+/**
+ * Maneja errores comunes de las llamadas a la API de pagos
+ * @private
+ */
+function handlePaymentError(
+  error: any,
+  context: Record<string, any>,
+  resourceType: string,
+  resourceId: number | string
+): never {
+  if (error instanceof ValidationError) {
+    throw error;
+  }
 
-export interface PaymentHealthResponse {
-  status: string;
-  database: string;
-  paymentsTable: string;
-  paymentsCount: number;
-  mercadoPago: string;
-  timestamp: string;
+  if (error?.status === 404) {
+    const errorMsg = `No se encontró ${resourceType} con ID ${resourceId}`;
+    logError(errorMsg, error, { ...context, suggestion: 'Verifica que el recurso existe en la base de datos' });
+    throw new Error(`${errorMsg}. Verifica que el ID sea correcto.`);
+  }
+
+  if (error?.message?.includes('No se pudo conectar')) {
+    const networkError = new NetworkError('No se pudo conectar con el servidor de pagos', error);
+    logError(networkError.message, networkError, context);
+    throw networkError;
+  }
+
+  logError(`Error en operación de ${resourceType}`, error, context);
+  throw error;
 }
 
 /**
@@ -111,15 +119,9 @@ export async function createPaymentPreference(
       }
     );
 
-    // LOG TEMPORAL: Ver la respuesta real del backend
-    console.log('🔍 [DEBUG] Respuesta raw del backend:', JSON.stringify(result, null, 2));
-
-    // El backend devuelve un formato simple: { url: "..." }
-    // Adaptamos a la estructura completa esperada
     const simpleValidation = safeValidateData(SimpleCheckoutResponseSchema, result);
 
     if (!simpleValidation.success) {
-      console.error('❌ [ERROR] Validación fallida:', simpleValidation.error.issues);
       logWarn('Respuesta de preferencia de pago no cumple con el esquema esperado', {
         ...context,
         errors: simpleValidation.error.issues,
@@ -128,49 +130,15 @@ export async function createPaymentPreference(
       throw new ValidationError('Datos de preferencia de pago inválidos');
     }
 
-    // Extraer preferenceId de la URL si es posible
-    const url = simpleValidation.data.url;
-    const prefMatch = url.match(/pref_id=([^&]+)/);
-    const preferenceId = prefMatch ? prefMatch[1] : '';
+    const validated = transformSimpleCheckoutResponse(
+      simpleValidation.data.url,
+      userInfractionId
+    );
 
-    // Construir respuesta adaptada con valores por defecto
-    const validated: PaymentPreferenceResponse = {
-      preferenceId: preferenceId,
-      initPoint: url,
-      amount: 0, // No disponible en respuesta simple
-      currency: 'COP',
-      obligationId: userInfractionId,
-      contractId: 0, // No disponible
-      paymentId: null, // No disponible
-    };
-
-    logDebug('Preferencia de pago creada exitosamente', { ...context, url });
+    logDebug('Preferencia de pago creada exitosamente', { ...context, url: validated.initPoint });
     return validated;
   } catch (error: any) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-    
-    // Manejo específico de error 404
-    if (error?.status === 404) {
-      const endpoint = `${PAYMENT_BASE_PATH}/infraction/${userInfractionId}/checkout`;
-      const errorMsg = `No se encontró la infracción con ID ${userInfractionId}`;
-      logError(errorMsg, error, { 
-        ...context, 
-        endpoint, 
-        userInfractionId,
-        suggestion: 'Verifica que la infracción existe en la base de datos'
-      });
-      throw new Error(`No se encontró la infracción con ID ${userInfractionId}. Verifica que el ID sea correcto.`);
-    }
-    
-    if (error && error.message && error.message.includes('No se pudo conectar')) {
-      const networkError = new NetworkError('No se pudo conectar con el servidor de pagos', error);
-      logError(networkError.message, networkError, context);
-      throw networkError;
-    }
-    logError('Error al crear preferencia de pago', error, context);
-    throw error;
+    handlePaymentError(error, context, 'la infracción', userInfractionId);
   }
 }
 
@@ -214,30 +182,9 @@ export async function getPaymentStatus(paymentId: number): Promise<PaymentStatus
     }
 
     logDebug('Estado de pago consultado exitosamente', { ...context, status: validated.status });
-    return validated;
+    return validated as PaymentStatus;
   } catch (error: any) {
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-    
-    // Manejo específico de error 404
-    if (error?.status === 404) {
-      const endpoint = `${PAYMENT_BASE_PATH}/${paymentId}`;
-      logError('Endpoint de estado de pago no encontrado', error, { 
-        ...context, 
-        endpoint,
-        paymentId
-      });
-      throw new Error(`No se encontró el pago con ID ${paymentId} o el endpoint no está disponible.`);
-    }
-    
-    if (error && error.message && error.message.includes('No se pudo conectar')) {
-      const networkError = new NetworkError('No se pudo conectar con el servidor de pagos', error);
-      logError(networkError.message, networkError, context);
-      throw networkError;
-    }
-    logError('Error al obtener estado del pago', error, context);
-    throw error;
+    handlePaymentError(error, context, 'el pago', paymentId);
   }
 }
 
@@ -284,7 +231,7 @@ export async function getUserPayments(userId: number): Promise<UserPayment[]> {
         const validItems = rawData.filter(item => {
           const itemValidation = validateData(UserPaymentListSchema.element, item);
           return itemValidation !== null;
-        });
+        }) as UserPayment[];
         logDebug(`Filtrados ${validItems.length}/${rawData.length} pagos válidos`, context);
         return validItems;
       }
@@ -292,7 +239,7 @@ export async function getUserPayments(userId: number): Promise<UserPayment[]> {
     }
 
     logDebug(`${validation.data.length} pagos consultados exitosamente`, context);
-    return validation.data;
+    return validation.data as UserPayment[];
   } catch (error: any) {
     if (error instanceof ValidationError) {
       throw error;
@@ -345,8 +292,6 @@ export async function createAgreementInstallmentPayment(
   try {
     const endpoint = `${PAYMENT_BASE_PATH}/agreement/${agreementId}/installment/${installmentId}/checkout`;
     logDebug(`Creando preferencia de pago para cuota ${installmentId} del acuerdo ${agreementId}`, context);
-    console.log('🔍 [DEBUG] URL completa a llamar:', endpoint);
-    console.log('🔍 [DEBUG] Parámetros:', { agreementId, installmentId });
 
     const result = await apiClient.apiFetch(
       endpoint,
@@ -359,40 +304,24 @@ export async function createAgreementInstallmentPayment(
       }
     );
 
-    // LOG TEMPORAL: Ver la respuesta real del backend
-    console.log('🔍 [DEBUG] Respuesta raw del backend (cuota):', JSON.stringify(result, null, 2));
-
-    // Intentar validar primero con el esquema simplificado (solo URL)
     const simpleValidated = validateData(SimpleCheckoutResponseSchema, result);
-    
+
     if (simpleValidated) {
-      // Backend devolvió formato simplificado, transformar a formato completo
-      logDebug('Respuesta de checkout simplificada recibida, transformando...', context);
-      
-      // Extraer preferenceId de la URL
-      const urlMatch = simpleValidated.url.match(/pref_id=([^&]+)/);
-      const preferenceId = urlMatch ? urlMatch[1] : 'unknown';
-      
-      const transformed: PaymentPreferenceResponse = {
-        preferenceId: preferenceId,
-        initPoint: simpleValidated.url,
-        amount: 0, // No disponible en respuesta simplificada
-        currency: 'COP', // Valor por defecto para Colombia
-        obligationId: installmentId, // ID de la cuota (obligación)
-        contractId: agreementId, // ID del acuerdo (contrato)
-        paymentId: null, // No disponible aún, se generará en MercadoPago
-      };
-      
-      logDebug('Preferencia de pago de cuota creada exitosamente (formato simplificado)', { 
-        ...context, 
-        preferenceId,
+      const transformed = transformSimpleCheckoutResponse(
+        simpleValidated.url,
+        installmentId,
+        agreementId
+      );
+
+      logDebug('Preferencia de pago de cuota creada exitosamente', {
+        ...context,
+        preferenceId: transformed.preferenceId,
         agreementId,
-        installmentId 
+        installmentId
       });
       return transformed;
     }
-    
-    // Si no es formato simplificado, intentar con esquema completo
+
     const validated = validateData(PaymentPreferenceResponseSchema, result);
 
     if (!validated) {
@@ -401,44 +330,9 @@ export async function createAgreementInstallmentPayment(
     }
 
     logDebug('Preferencia de pago de cuota creada exitosamente', { ...context, paymentId: validated.paymentId });
-    return validated;
+    return validated as PaymentPreferenceResponse;
   } catch (error: any) {
-    // LOG DETALLADO DEL ERROR
-    console.error('❌ [DEBUG] Error completo en createAgreementInstallmentPayment:', {
-      message: error?.message,
-      status: error?.status,
-      body: error?.body,
-      stack: error?.stack,
-      fullError: JSON.stringify(error, Object.getOwnPropertyNames(error))
-    });
-
-    if (error instanceof ValidationError) {
-      throw error;
-    }
-
-    // Manejo específico de error 404
-    if (error?.status === 404) {
-      const endpoint = `${PAYMENT_BASE_PATH}/agreement/${agreementId}/installment/${installmentId}/checkout`;
-      const errorMsg = error?.message?.includes('cuota')
-        ? `No se encontró la cuota con ID ${installmentId}`
-        : `No se encontró el acuerdo con ID ${agreementId}`;
-      logError(errorMsg, error, {
-        ...context,
-        endpoint,
-        agreementId,
-        installmentId,
-        suggestion: 'Verifica que el acuerdo y la cuota existen en la base de datos'
-      });
-      throw new Error(errorMsg);
-    }
-
-    if (error && error.message && error.message.includes('No se pudo conectar')) {
-      const networkError = new NetworkError('No se pudo conectar con el servidor de pagos', error);
-      logError(networkError.message, networkError, context);
-      throw networkError;
-    }
-    logError('Error al crear preferencia de pago de cuota', error, context);
-    throw error;
+    handlePaymentError(error, context, 'el acuerdo o cuota', `${agreementId}/${installmentId}`);
   }
 }
 

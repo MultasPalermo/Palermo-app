@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, ImageBackground, ViewStyle, TextStyle, Alert, Modal, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator, FlatList, ImageBackground, ViewStyle, TextStyle, Alert, Modal } from 'react-native';
 import { TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import BackButton from '../components/BackButton';
 import styles from '../styles/PaymentAgreementScreenStyles';
+import modalStyles from '../styles/InstallmentModalStyles';
 import usePaymentAgreements from '../hooks/usePaymentAgreements';
 import { InstallmentPaymentButton } from './InstallmentPaymentButton';
 import { AcuerdoPagoScreenProps, RenderAgreementItemProps } from '../interfaces/screens';
@@ -232,7 +233,7 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
 
             {/* Botón de Pago de Cuota */}
             {!item.isPaid && (
-              <View style={{ marginTop: 20, paddingHorizontal: 16 }}>
+              <View style={styles.paymentButtonContainer}>
                 {payingInstallmentId ? (
                   <InstallmentPaymentButton
                     agreementId={Number(item.id)}
@@ -253,20 +254,12 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
                   />
                 ) : (
                   <TouchableOpacity
-                    style={{
-                      backgroundColor: '#01763C',
-                      paddingVertical: 14,
-                      paddingHorizontal: 20,
-                      borderRadius: 8,
-                      alignItems: 'center',
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                    }}
+                    style={styles.selectInstallmentButton}
                     onPress={() => handlePayInstallment(item.id, item)}
                     activeOpacity={0.8}
                   >
                     <Ionicons name="card-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
-                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
+                    <Text style={styles.selectInstallmentButtonText}>
                       Pagar una Cuota
                     </Text>
                   </TouchableOpacity>
@@ -435,83 +428,5 @@ const PaymentAgreementScreen: React.FC<AcuerdoPagoScreenProps> = ({ navigation }
     </ImageBackground>
   );
 };
-
-const modalStyles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modal: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 24,
-    width: '85%',
-    maxWidth: 400,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#01763C',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
-  },
-  infoText: {
-    fontSize: 13,
-    color: '#01763C',
-    marginBottom: 16,
-    fontWeight: '500',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  inputError: {
-    borderColor: '#F44336',
-    borderWidth: 2,
-  },
-  errorText: {
-    color: '#F44336',
-    fontSize: 13,
-    marginBottom: 12,
-    marginTop: 4,
-  },
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  button: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  buttonCancel: {
-    backgroundColor: '#f0f0f0',
-  },
-  buttonConfirm: {
-    backgroundColor: '#01763C',
-  },
-  buttonTextCancel: {
-    color: '#666',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  buttonTextConfirm: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default PaymentAgreementScreen;

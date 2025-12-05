@@ -1,4 +1,4 @@
-import { formatCurrency, formatDate, formatPhoneNumber, capitalizeWords } from '../formatters';
+import { formatCurrency, formatDate, formatPhoneNumber, capitalizeWords } from '../../src/utils/formatters';
 
 describe('formatters', () => {
   describe('formatCurrency', () => {

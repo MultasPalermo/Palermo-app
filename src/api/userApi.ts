@@ -1,6 +1,6 @@
 
 import apiClient from './apiClient';
-import { User } from '../types/api';
+import type { User } from '../interfaces';
 import { UserSchema, validateData } from '../validation/schemas';
 import { logDebug, logError, logWarn } from '../utils/logger';
 import { NetworkError, ValidationError } from '../utils/errorHandler';

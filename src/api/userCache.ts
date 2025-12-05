@@ -1,4 +1,4 @@
-import { User, DocumentInfo } from '../types/api';
+import type { User, DocumentInfo } from '../interfaces';
 
 // Cache simple para almacenar datos de usuario y documento
 let userData: User | null = null;

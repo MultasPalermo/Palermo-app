@@ -1,4 +1,4 @@
-import { InfraccionAPI } from '../types/api';
+import type { InfraccionAPI } from '../interfaces';
 
 // Cache simple para almacenar las infracciones consultadas
 let infraccionesData: InfraccionAPI[] | null = null;
